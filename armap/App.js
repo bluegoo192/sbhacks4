@@ -2,26 +2,35 @@ import React from 'react';
 import * as THREE from 'three';
 import ExpoTHREE from 'expo-three';
 import Expo from 'expo';
-import { StyleSheet, Text, View, PanResponder } from 'react-native';
+import { StyleSheet, Text, View, PanResponder, TouchableOpacity } from 'react-native';
 
 console.disableYellowBox = true;
 
 export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {interfacePosition: 100};
+  }
 
   componentWillMount() {
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {
         this.touching = true;
-        console.log("something");
       },
       onPanResponderRelease: () => {
         this.touching = false;
-        console.log("something");
+        this.validateInterfacePosition();
       },
       onPanResponderTerminate: () => {
         this.touching = false;
-        console.log("something");
+        this.validateInterfacePosition();
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        //console.log("swipe "+JSON.stringify(gestureState));
+        if (this.state.interfacePosition > 30 && gestureState.dy < 0) {
+          this.setState({interfacePosition: Math.max(100 + gestureState.dy, 30) });
+        }
       },
       onShouldBlockNativeResponder: () => false,
     });
@@ -29,13 +38,20 @@ export default class App extends React.Component {
 
   render() {
     return (
-      <Expo.GLView
-      {...this.panResponder.panHandlers}
-      ref={(ref) => this._glView = ref}
-      style={{ flex: 1 }}
-      onContextCreate={this._onGLContextCreate}
-      onPress={console.log("hi")}
-      />
+      <View style={{ flex: 1 }}>
+        <Expo.GLView
+        {...this.panResponder.panHandlers}
+        ref={(ref) => this._glView = ref}
+        style={{ flex: 1 }}
+        onContextCreate={this._onGLContextCreate}
+        />
+        <View style={{ flex: 1, position: 'absolute', top: this.state.interfacePosition+'%', backgroundColor: '#fff' }}>
+          <Text>Test text please ignore</Text>
+          <TouchableOpacity style={styles.button} onPress={this.closeInterface}>
+            <Text>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     );
   }
 
@@ -60,18 +76,30 @@ export default class App extends React.Component {
     const cube = new THREE.Mesh(geometry, material);
     cube.position.x = 0;
     cube.position.y = 0;
-    cube.position.z = 0.4;
+    cube.position.z = -0.4;
     scene.add(cube);
 
     const animate = () => {
       requestAnimationFrame(animate);
       cube.rotation.x += 0.02;
       cube.rotation.y += 0.01;
-      cube.position.z -= 0.001;
       renderer.render(scene, camera);
       gl.endFrameEXP();
     }
     animate();
+  }
+
+  validateInterfacePosition = () => {
+    if (this.state.interfacePosition < 30) {
+      this.setState({interfacePosition: 30});
+    }
+    if (this.state.interfacePosition > 100) {
+      this.setState({interfacePosition: 100});
+    }
+  }
+
+  closeInterface = () => {
+    this.setState({interfacePosition: 100});
   }
 }
 
@@ -83,4 +111,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  button: {
+    alignItems: 'center',
+    backgroundColor: '#DDDDDD',
+    padding: 10
+  }
 });
