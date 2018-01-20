@@ -2,53 +2,77 @@ import React from 'react';
 import * as THREE from 'three';
 import ExpoTHREE from 'expo-three';
 import Expo from 'expo';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, PanResponder } from 'react-native';
 
 console.disableYellowBox = true;
 
 export default class App extends React.Component {
+
+  componentWillMount() {
+    this.panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        this.touching = true;
+        console.log("something");
+      },
+      onPanResponderRelease: () => {
+        this.touching = false;
+        console.log("something");
+      },
+      onPanResponderTerminate: () => {
+        this.touching = false;
+        console.log("something");
+      },
+      onShouldBlockNativeResponder: () => false,
+    });
+  }
+
   render() {
     return (
       <Expo.GLView
-        ref={(ref) => this._glView = ref}
-        style={{ flex: 1 }}
-        onContextCreate={this._onGLContextCreate}
+      {...this.panResponder.panHandlers}
+      ref={(ref) => this._glView = ref}
+      style={{ flex: 1 }}
+      onContextCreate={this._onGLContextCreate}
+      onPress={console.log("hi")}
       />
     );
   }
 
   _onGLContextCreate = async (gl) => {
-   // Do graphics stuff here!
-   const arSession = await this._glView.startARSessionAsync();
-   const scene = new THREE.Scene();
-const camera = ExpoTHREE.createARCamera(
-  arSession,
-  gl.drawingBufferWidth,
-  gl.drawingBufferHeight,
-  0.01,
-  1000
-);
-const renderer = ExpoTHREE.createRenderer({ gl });
-renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
+    // Do graphics stuff here!
+    const arSession = await this._glView.startARSessionAsync();
+    const scene = new THREE.Scene();
+    const camera = ExpoTHREE.createARCamera(
+      arSession,
+      gl.drawingBufferWidth,
+      gl.drawingBufferHeight,
+      0.01,
+      1000
+    );
+    const renderer = ExpoTHREE.createRenderer({ gl });
+    renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-scene.background = ExpoTHREE.createARBackgroundTexture(arSession, renderer);
+    scene.background = ExpoTHREE.createARBackgroundTexture(arSession, renderer);
 
-const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-cube.position.z = -0.4;
-scene.add(cube);
+    const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const cube = new THREE.Mesh(geometry, material);
+    cube.position.x = 0;
+    cube.position.y = 0;
+    cube.position.z = 0.4;
+    scene.add(cube);
 
-cube.position.z = -0.4;
-const animate = () => {
-  requestAnimationFrame(animate);
-  cube.rotation.x += 0.07;
-cube.rotation.y += 0.04;
-  renderer.render(scene, camera);
-  gl.endFrameEXP();
-}
-animate();
- }
+    const animate = () => {
+      requestAnimationFrame(animate);
+      cube.rotation.x += 0.02;
+      cube.rotation.y += 0.01;
+      cube.position.z -= 0.001;
+      renderer.render(scene, camera);
+      gl.endFrameEXP();
+    }
+    animate();
+  }
 }
 
 
