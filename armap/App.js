@@ -9,7 +9,11 @@ console.disableYellowBox = true;
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {interfacePosition: 100};
+    this.state = {
+      interfacePosition: 100,
+      loaded: false,
+      signs: []
+    };
   }
 
   componentWillMount() {
@@ -34,6 +38,7 @@ export default class App extends React.Component {
       },
       onShouldBlockNativeResponder: () => false,
     });
+    this.loadSigns();
   }
 
   render() {
@@ -69,23 +74,28 @@ export default class App extends React.Component {
     renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
 
     scene.background = ExpoTHREE.createARBackgroundTexture(arSession, renderer);
+    this.state.signs.forEach((sign) => {
+      scene.add(sign);
+      console.log("Added a sign");
+    });
 
+    const animate = () => {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+      gl.endFrameEXP();
+    }
+    animate();
+  }
+
+  loadSigns = async () => {
+    // get signs from Firebase
     const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     const cube = new THREE.Mesh(geometry, material);
     cube.position.x = 0;
     cube.position.y = 0;
     cube.position.z = -0.4;
-    scene.add(cube);
-
-    const animate = () => {
-      requestAnimationFrame(animate);
-      cube.rotation.x += 0.02;
-      cube.rotation.y += 0.01;
-      renderer.render(scene, camera);
-      gl.endFrameEXP();
-    }
-    animate();
+    this.setState({signs: this.state.signs.concat([cube]), loaded: true});
   }
 
   validateInterfacePosition = () => {
