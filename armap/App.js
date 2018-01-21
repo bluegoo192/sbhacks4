@@ -51,18 +51,18 @@ export default class App extends React.Component {
         }
       },
       camera: null,
-      multiplier: 0.65,
+      multiplier: 0.6,
       heading: 0,
       scene: null,
       overlayOpacity: 0,
       corwinFloor1: {
         latitude: 34.411614,
-        longitude: -119.847904,
+        longitude: -119.847977,
         altitude: 0
       },
       mccFloor1: {
-        latitude: 34.411602,
-        longitude: -119.846647,
+        latitude: 34.411567,
+        longitude: -119.8463,
         altitude: 0
       },
       floorPlans: [],
@@ -292,7 +292,7 @@ export default class App extends React.Component {
     let tempTypes = {};
 
     //bathroom
-    const bathroomGeometry = new THREE.BoxGeometry(1, 1, 1);
+    const bathroomGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
     var bathroomMaterial = new THREE.MeshBasicMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/restroom_signs_unisex.jpg')),
@@ -301,7 +301,7 @@ export default class App extends React.Component {
     tempTypes.bathroom = {geometry: bathroomGeometry, material: bathroomMaterial};
 
     //exit
-    const exitGeometry = new THREE.BoxGeometry(1, 0.6, 0.3);
+    const exitGeometry = new THREE.BoxGeometry(1.5, 0.8, 0.475);
     const exitMaterial = new THREE.MeshBasicMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/exit.jpg'))
@@ -310,7 +310,7 @@ export default class App extends React.Component {
     tempTypes.exit = {geometry: exitGeometry, material: exitMaterial};
 
     //water fountain
-    const waterFountainGeometry = new THREE.BoxGeometry(1, 1, 1);
+    const waterFountainGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
     var waterFountainMaterial = new THREE.MeshBasicMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/water_fountain.png')),
@@ -319,7 +319,7 @@ export default class App extends React.Component {
     tempTypes.waterFountain = {geometry: waterFountainGeometry, material: waterFountainMaterial};
 
     //stairs
-    const stairsGeometry = new THREE.BoxGeometry(1, 1, 1);
+    const stairsGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
     var stairsMaterial = new THREE.MeshBasicMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/stairs.png')),
@@ -328,7 +328,7 @@ export default class App extends React.Component {
     tempTypes.stairs = {geometry: stairsGeometry, material: stairsMaterial};
 
     //podium
-    const podiumGeometry = new THREE.BoxGeometry(1.3, 1.3, 1.3);
+    const podiumGeometry = new THREE.BoxGeometry(2, 2, 2);
     var podiumMaterial = new THREE.MeshBasicMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/podium.jpg')),
@@ -337,7 +337,7 @@ export default class App extends React.Component {
     tempTypes.podium = {geometry: podiumGeometry, material: podiumMaterial};
 
     //elevator
-    const elevatorGeometry = new THREE.BoxGeometry(0.8, 1.3, 0.8);
+    const elevatorGeometry = new THREE.BoxGeometry(1.2, 2.1, 1.2);
     var elevatorMaterial = new THREE.MeshBasicMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/elevator.png')),
@@ -346,7 +346,7 @@ export default class App extends React.Component {
     tempTypes.elevator = {geometry: elevatorGeometry, material: elevatorMaterial};
 
     //food
-    const foodGeometry = new THREE.BoxGeometry(0.9, 0.9, 0.9);
+    const foodGeometry = new THREE.BoxGeometry(1.2, 1.2, 1.2);
     var foodMaterial = new THREE.MeshBasicMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/food.png')),
@@ -355,7 +355,7 @@ export default class App extends React.Component {
     tempTypes.food = {geometry: foodGeometry, material: foodMaterial};
 
     //storke
-    const storkeGeometry = new THREE.BoxGeometry(2.5, 10, 2.5);
+    const storkeGeometry = new THREE.BoxGeometry(4, 16, 4);
     var storkeMaterial = new THREE.MeshBasicMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/storke.jpg')),
@@ -402,7 +402,7 @@ export default class App extends React.Component {
   loadFloorPlan = async () => {
     let floorPlans = [];
     let app = this;
-    let corwinFloor1geometry = new THREE.PlaneGeometry( 400, 200, 32 );
+    let corwinFloor1geometry = new THREE.PlaneGeometry( 350, 175, 32 );
     let corwinFloor1material = new THREE.MeshLambertMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/floorplan.png')),
