@@ -363,6 +363,15 @@ export default class App extends React.Component {
     });
     tempTypes.storke = {geometry: storkeGeometry, material: storkeMaterial};
 
+    //booth
+    const boothGeometry = new THREE.BoxGeometry(1, 1, 0.3);
+    var boothMaterial = new THREE.MeshBasicMaterial({
+      map: await ExpoTHREE.createTextureAsync({
+        asset: Expo.Asset.fromModule(require('./assets/booth.png')),
+      })
+    });
+    tempTypes.booth = {geometry: boothGeometry, material: boothMaterial};
+
     this.setState({signTypes: tempTypes});
   }
 
