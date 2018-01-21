@@ -27,11 +27,11 @@ export default class App extends React.Component {
       loaded: false,
       signs: [],
       location: null,
-      cube: null,
       camera: null,
       latitude: 0,
       longitude: 0,
-      altitude: 0
+      altitude: 0,
+      camera: null
     };
   }
 
@@ -40,6 +40,7 @@ export default class App extends React.Component {
       onStartShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {
         this.touching = true;
+        this.setSign("oh yoyoyo");
       },
       onPanResponderRelease: () => {
         this.touching = false;
@@ -58,6 +59,7 @@ export default class App extends React.Component {
       onShouldBlockNativeResponder: () => false,
     });
     this.loadSigns();
+    this._getLocationAsync();
   }
 
   render() {
@@ -76,24 +78,6 @@ export default class App extends React.Component {
         </View>
       </View>
     );
-  }
-
-  componentWillMount() {
-    this.panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        // this.state.cube.position.x = this.state.camera.position.x;
-        // this.state.cube.position.y = this.state.camera.position.y;
-        // this.state.cube.position.z = this.state.camera.position.z - 0.1;
-        this.setSign("oh yoyoyo");
-      },
-      onPanResponderRelease: () => {
-      },
-      onPanResponderTerminate: () => {
-      },
-      onShouldBlockNativeResponder: () => false,
-    });
-    this._getLocationAsync();
   }
 
   _getLocationAsync = async () => {
@@ -158,7 +142,6 @@ export default class App extends React.Component {
     cube.position.z = -0.4;
     scene.add(cube);
     this.setState({
-      cube: cube,
       camera: camera
     });
     this.state.signs.forEach((sign) => {
@@ -182,13 +165,13 @@ export default class App extends React.Component {
         });
     });
     // get signs from Firebase
-    const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    cube.position.x = 0;
-    cube.position.y = 0;
-    cube.position.z = -0.4;
-    this.setState({signs: this.state.signs.concat([cube]), loaded: true});
+    // const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
+    // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    // const cube = new THREE.Mesh(geometry, material);
+    // cube.position.x = 0;
+    // cube.position.y = 0;
+    // cube.position.z = -0.4;
+    // this.setState({signs: this.state.signs.concat([cube]), loaded: true});
   }
 
   validateInterfacePosition = () => {
