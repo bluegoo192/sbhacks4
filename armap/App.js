@@ -5,7 +5,7 @@ import ExpoTHREE from 'expo-three';
 import Expo from 'expo';
 let Parse = require('./utils/parseSvg.js');
 import { Constants, Location, Permissions } from 'expo';
-import { StyleSheet, Text, View, Button, PanResponder, TouchableOpacity, Picker } from 'react-native';
+import { StyleSheet, Text, View, Button, PanResponder, TouchableOpacity, Image } from 'react-native';
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -94,9 +94,9 @@ export default class App extends React.Component {
       },
       onPanResponderMove: (evt, gestureState) => {
         //console.log("swipe "+JSON.stringify(gestureState));
-        if ((this.state.interfacePosition > 30 && gestureState.dy < 0) || this.touching) {
+        if ((this.state.interfacePosition > uiOffset && gestureState.dy < 0) || this.touching) {
           this.setState({
-            interfacePosition: Math.max(100 + (gestureState.dy / 3), 30),
+            interfacePosition: Math.max(100 + (gestureState.dy / 3), uiOffset),
             overlayOpacity: (100 - this.state.interfacePosition) / 100
           });
         }
@@ -118,25 +118,32 @@ export default class App extends React.Component {
           <Text style={{ fontFamily: 'Bodoni 72', margin: 10, alignItems: 'center', fontSize: 50, color: '#fff', fontStyle: 'italic' }}>Pathfind<Text style={{ fontWeight: 'bold', fontStyle: 'normal', fontFamily: 'Avenir' }}>AR</Text></Text>
         </View>
         <View style={{ position: 'absolute', left: 0, right: 0, justifyContent: 'center', alignItems: 'center', top: this.state.interfacePosition+'%' }}>
-          <Text style={{ fontFamily: 'Bodoni 72', margin: 10, alignItems: 'center', fontSize: 50, color: '#fff', fontStyle: 'italic' }}>Pathfind<Text style={{ fontWeight: 'bold', fontStyle: 'normal', fontFamily: 'Avenir' }}>AR</Text></Text>
-          <TouchableOpacity style={styles.button} onPress={this.loadFloorPlan}>
-            <Text style={styles.interfaceTextSmall}>Show floor plan</Text>
-          </TouchableOpacity>
+          <Text style={{ fontFamily: 'Bodoni 72', margin: 10, paddingBottom: 10, alignItems: 'center', fontSize: 50, color: '#fff', fontStyle: 'italic' }}>Pathfind<Text style={{ fontWeight: 'bold', fontStyle: 'normal', fontFamily: 'Avenir' }}>AR</Text></Text>
           <Text style={styles.interfaceText}>Add waypoint</Text>
           <View style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: 10 }}>
             <TouchableOpacity style={styles.button} onPress={() => {this.setSign('bathroom')}}>
-              <Text style={styles.interfaceTextSmall}>Bathroom</Text>
+              <Image style={{width: 100, height: 100}} source={require('./assets/anim_restroom.gif')} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => {this.setSign('exit')}}>
-              <Text style={styles.interfaceTextSmall}>Exit</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => {this.setSign('waterFountain')}}>
-              <Text style={styles.interfaceTextSmall}>Fountain</Text>
+              <Image style={{width: 100, height: 100}} source={require('./assets/anim_exit.gif')} />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.closeButton} onPress={this.closeInterface}>
-            <Text style={styles.interfaceText}>Close</Text>
-          </TouchableOpacity>
+          <View style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: 10 }}>
+            <TouchableOpacity style={styles.button} onPress={() => {this.setSign('waterFountain')}}>
+              <Image style={{width: 100, height: 100}} source={require('./assets/anim_water.gif')} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => {this.setSign('stairs')}}>
+              <Image style={{width: 100, height: 100}} source={require('./assets/anim_stairs.gif')} />
+            </TouchableOpacity>
+          </View>
+          <View style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: 10, marginTop: 10 }}>
+            <TouchableOpacity style={styles.closeButton} onPress={this.loadFloorPlan}>
+              <Text style={styles.interfaceTextSmall}>Show floor plans</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.closeButton} onPress={this.closeInterface}>
+              <Text style={styles.interfaceText}>Close</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -211,7 +218,7 @@ export default class App extends React.Component {
       // this.state.floorPlans.forEach((floorPlan) => {
       //   floorPlan.rotation.z += 0.015;
       // })
-      if (this.state.interfacePosition < 100 && this.state.interfacePosition > 30 && !this.touching) {
+      if (this.state.interfacePosition < 100 && this.state.interfacePosition > uiOffset && !this.touching) {
         this.setState({
           interfacePosition: this.state.interfacePosition - (this.state.interfacePosition / 13),
           overlayOpacity: (100 - this.state.interfacePosition) / 100
@@ -304,11 +311,10 @@ export default class App extends React.Component {
 
     //water fountain
     const waterFountainGeometry = new THREE.BoxGeometry(1, 1, 1);
-    var waterFountainMaterial = new THREE.MeshLambertMaterial({
+    var waterFountainMaterial = new THREE.MeshBasicMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/water_fountain.png')),
-      }),
-      transparent: true
+      })
     });
     tempTypes.waterFountain = {geometry: waterFountainGeometry, material: waterFountainMaterial};
 
@@ -320,6 +326,24 @@ export default class App extends React.Component {
       })
     });
     tempTypes.stairs = {geometry: stairsGeometry, material: stairsMaterial};
+
+    //podium
+    const podiumGeometry = new THREE.BoxGeometry(1.3, 1.3, 1.3);
+    var podiumMaterial = new THREE.MeshBasicMaterial({
+      map: await ExpoTHREE.createTextureAsync({
+        asset: Expo.Asset.fromModule(require('./assets/podium.jpg')),
+      })
+    });
+    tempTypes.podium = {geometry: podiumGeometry, material: podiumMaterial};
+
+    //elevator
+    const elevatorGeometry = new THREE.BoxGeometry(0.8, 1.3, 0.8);
+    var elevatorMaterial = new THREE.MeshBasicMaterial({
+      map: await ExpoTHREE.createTextureAsync({
+        asset: Expo.Asset.fromModule(require('./assets/elevator.png')),
+      })
+    });
+    tempTypes.elevator = {geometry: elevatorGeometry, material: elevatorMaterial};
 
     this.setState({signTypes: tempTypes});
   }
@@ -420,8 +444,8 @@ export default class App extends React.Component {
   }
 
   validateInterfacePosition = () => {
-    if (this.state.interfacePosition < 30) {
-      this.setState({interfacePosition: 30, overlayOpacity: 0.6});
+    if (this.state.interfacePosition < uiOffset) {
+      this.setState({interfacePosition: uiOffset, overlayOpacity: 0.6});
     }
     if (this.state.interfacePosition > 100) {
       this.setState({interfacePosition: 100, overlayOpacity: 0});
@@ -435,15 +459,16 @@ export default class App extends React.Component {
 
 }
 
+const uiOffset = 15;
 
 const styles = StyleSheet.create({
   button: {
     flex: 1,
     display: 'flex',
     alignItems: 'center',
-    backgroundColor: '#27ae60',
-    padding: 10,
-    margin: 10
+    //backgroundColor: '#27ae60',
+    // padding: 10,
+    // margin: 10
   },
   closeButton: {
     flex: 1,
@@ -451,6 +476,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderColor: '#ecf0f1',
+    justifyContent: 'center',
     padding: 10,
     margin: 10
   },
