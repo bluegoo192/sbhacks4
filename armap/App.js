@@ -51,7 +51,7 @@ export default class App extends React.Component {
         }
       },
       camera: null,
-      multiplier: 0.57,
+      multiplier: 0.65,
       heading: 0,
       scene: null,
       overlayOpacity: 0,
@@ -384,7 +384,7 @@ export default class App extends React.Component {
   loadFloorPlan = async () => {
     let floorPlans = [];
     let app = this;
-    let corwinFloor1geometry = new THREE.PlaneGeometry( 300, 150, 32 );
+    let corwinFloor1geometry = new THREE.PlaneGeometry( 400, 200, 32 );
     let corwinFloor1material = new THREE.MeshLambertMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/floorplan.png')),
