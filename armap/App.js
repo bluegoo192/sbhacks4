@@ -153,15 +153,20 @@ export default class App extends React.Component {
 
   createSignTypes = async () => {// Create a mesh for each sign type
     let tempTypes = {};
-    const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
-    var material = new THREE.MeshBasicMaterial({
+    const _geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
+    var _material = new THREE.MeshBasicMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/restroom_signs_unisex.jpg')),
       })
     });
-    const bathroomCube = new THREE.Mesh(geometry, material);
-    tempTypes.bathroom = bathroomCube;
+    // const bathroomCube = new THREE.Mesh(_geometry, _material);
+    tempTypes.bathroom = {geometry: _geometry, material: _material};
     this.setState({signTypes: tempTypes});
+  }
+
+  createMesh = (type) => {
+    let template = this.state.signTypes[type];
+    return new THREE.Mesh(template.geometry, template.material);
   }
 
   loadSigns = async () => {
@@ -171,8 +176,13 @@ export default class App extends React.Component {
           var childData = childSnapshot.val();
         });
     });
-    let cube = this.state.signTypes.bathroom;
+    let signs = [];
+    let cube = this.createMesh("bathroom");
     cube.position.z = 0.3;
+    signs.push(cube);
+    let cube2 = this.createMesh("bathroom");
+    cube2.position.z = 0.5;
+    signs.push(cube2);
     // get signs from Firebase
     // const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
     // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
@@ -180,7 +190,7 @@ export default class App extends React.Component {
     // cube.position.x = 0;
     // cube.position.y = 0;
     // cube.position.z = -0.4;
-    this.setState({signs: this.state.signs.concat([cube]), loaded: true});
+    this.setState({signs: this.state.signs.concat(signs), loaded: true});
   }
 
   validateInterfacePosition = () => {
