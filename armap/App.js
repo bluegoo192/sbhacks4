@@ -49,6 +49,7 @@ export default class App extends React.Component {
       multiplier: 0.57,
       heading: 0,
       scene: null,
+      overlayOpacity: 0,
       corwinFloor1: {
         latitude: 34.411629,
         longitude: -119.847158,
@@ -83,8 +84,11 @@ export default class App extends React.Component {
       },
       onPanResponderMove: (evt, gestureState) => {
         //console.log("swipe "+JSON.stringify(gestureState));
-        if (this.state.interfacePosition > 30 && gestureState.dy < 0) {
-          this.setState({interfacePosition: Math.max(100 + (gestureState.dy / 3), 30) });
+        if ((this.state.interfacePosition > 30 && gestureState.dy < 0) || this.touching) {
+          this.setState({
+            interfacePosition: Math.max(100 + (gestureState.dy / 3), 30),
+            overlayOpacity: (100 - this.state.interfacePosition) / 100
+          });
         }
       },
       onShouldBlockNativeResponder: () => false,
@@ -94,15 +98,12 @@ export default class App extends React.Component {
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
-        <View style={{ top: 0, backgroundColor: '#27ae60', alignItems: 'center', paddingTop: 7 }}>
-          <Text style={{ fontFamily: 'Bodoni 72', margin: 10, alignItems: 'center', fontSize: 20, color: '#fff', fontStyle: 'italic' }}>Pathfind<Text style={{ fontWeight: 'bold', fontStyle: 'normal', fontFamily: 'Avenir' }}>AR</Text></Text>
-        </View>
+      <View style={{ flex: 1 }} {...this.panResponder.panHandlers}>
         <Expo.GLView
-        {...this.panResponder.panHandlers}
         ref={(ref) => this._glView = ref}
         style={{ flex: 1 }}
         onContextCreate={this._onGLContextCreate}/>
+        <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: '#2c3e50', opacity: this.state.overlayOpacity }} />
         <View style={{ position: 'absolute', left: 0, right: 0, justifyContent: 'center', alignItems: 'center', top: this.state.interfacePosition+'%' }}>
           <Text style={{ fontFamily: 'Bodoni 72', margin: 10, alignItems: 'center', fontSize: 50, color: '#fff', fontStyle: 'italic' }}>Pathfind<Text style={{ fontWeight: 'bold', fontStyle: 'normal', fontFamily: 'Avenir' }}>AR</Text></Text>
           <TouchableOpacity style={styles.button} onPress={this.loadFloorPlan}>
@@ -198,7 +199,10 @@ export default class App extends React.Component {
       //   floorPlan.rotation.z += 0.015;
       // })
       if (this.state.interfacePosition < 100 && this.state.interfacePosition > 30 && !this.touching) {
-        this.setState({interfacePosition: this.state.interfacePosition - (this.state.interfacePosition / 13) });
+        this.setState({
+          interfacePosition: this.state.interfacePosition - (this.state.interfacePosition / 13),
+          overlayOpacity: (100 - this.state.interfacePosition) / 100
+        });
       }
       renderer.render(scene, camera);
       gl.endFrameEXP();
@@ -381,16 +385,16 @@ export default class App extends React.Component {
 
   validateInterfacePosition = () => {
     if (this.state.interfacePosition < 30) {
-      this.setState({interfacePosition: 30});
+      this.setState({interfacePosition: 30, overlayOpacity: 0.6});
     }
     if (this.state.interfacePosition > 100) {
-      this.setState({interfacePosition: 100});
+      this.setState({interfacePosition: 100, overlayOpacity: 0});
     }
   }
 
   closeInterface = () => {
     console.log("pressed close interface");
-    this.setState({interfacePosition: 100});
+    this.setState({interfacePosition: 100, overlayOpacity: 0});
   }
 
 }
