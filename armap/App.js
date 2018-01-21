@@ -354,6 +354,15 @@ export default class App extends React.Component {
     });
     tempTypes.food = {geometry: foodGeometry, material: foodMaterial};
 
+    //storke
+    const storkeGeometry = new THREE.BoxGeometry(2.5, 10, 2.5);
+    var storkeMaterial = new THREE.MeshBasicMaterial({
+      map: await ExpoTHREE.createTextureAsync({
+        asset: Expo.Asset.fromModule(require('./assets/storke.jpg')),
+      })
+    });
+    tempTypes.storke = {geometry: storkeGeometry, material: storkeMaterial};
+
     this.setState({signTypes: tempTypes});
   }
 
