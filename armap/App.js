@@ -5,7 +5,7 @@ import ExpoTHREE from 'expo-three';
 import Expo from 'expo';
 let Parse = require('./utils/parseSvg.js');
 import { Constants, Location, Permissions } from 'expo';
-import { StyleSheet, Text, View, Button, PanResponder, TouchableOpacity, Picker } from 'react-native';
+import { StyleSheet, Text, View, Button, PanResponder, TouchableOpacity, Image } from 'react-native';
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -84,9 +84,9 @@ export default class App extends React.Component {
       },
       onPanResponderMove: (evt, gestureState) => {
         //console.log("swipe "+JSON.stringify(gestureState));
-        if ((this.state.interfacePosition > 30 && gestureState.dy < 0) || this.touching) {
+        if ((this.state.interfacePosition > uiOffset && gestureState.dy < 0) || this.touching) {
           this.setState({
-            interfacePosition: Math.max(100 + (gestureState.dy / 3), 30),
+            interfacePosition: Math.max(100 + (gestureState.dy / 3), uiOffset),
             overlayOpacity: (100 - this.state.interfacePosition) / 100
           });
         }
@@ -115,13 +115,18 @@ export default class App extends React.Component {
           <Text style={styles.interfaceText}>Add waypoint</Text>
           <View style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: 10 }}>
             <TouchableOpacity style={styles.button} onPress={() => {this.setSign('bathroom')}}>
-              <Text style={styles.interfaceTextSmall}>Bathroom</Text>
+              <Image style={{width: 100, height: 100}} source={require('./assets/anim_restroom.gif')} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => {this.setSign('exit')}}>
-              <Text style={styles.interfaceTextSmall}>Exit</Text>
+              <Image style={{width: 100, height: 100}} source={require('./assets/anim_exit.gif')} />
             </TouchableOpacity>
+          </View>
+          <View style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: 10 }}>
             <TouchableOpacity style={styles.button} onPress={() => {this.setSign('waterFountain')}}>
-              <Text style={styles.interfaceTextSmall}>Fountain</Text>
+              <Image style={{width: 100, height: 100}} source={require('./assets/anim_water.gif')} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => {this.setSign('stairs')}}>
+              <Image style={{width: 100, height: 100}} source={require('./assets/anim_stairs.gif')} />
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.closeButton} onPress={this.closeInterface}>
@@ -201,7 +206,7 @@ export default class App extends React.Component {
       // this.state.floorPlans.forEach((floorPlan) => {
       //   floorPlan.rotation.z += 0.015;
       // })
-      if (this.state.interfacePosition < 100 && this.state.interfacePosition > 30 && !this.touching) {
+      if (this.state.interfacePosition < 100 && this.state.interfacePosition > uiOffset && !this.touching) {
         this.setState({
           interfacePosition: this.state.interfacePosition - (this.state.interfacePosition / 13),
           overlayOpacity: (100 - this.state.interfacePosition) / 100
@@ -294,11 +299,10 @@ export default class App extends React.Component {
 
     //water fountain
     const waterFountainGeometry = new THREE.BoxGeometry(1, 1, 1);
-    var waterFountainMaterial = new THREE.MeshLambertMaterial({
+    var waterFountainMaterial = new THREE.MeshBasicMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/water_fountain.png')),
-      }),
-      transparent: true
+      })
     });
     tempTypes.waterFountain = {geometry: waterFountainGeometry, material: waterFountainMaterial};
 
@@ -387,8 +391,8 @@ export default class App extends React.Component {
   }
 
   validateInterfacePosition = () => {
-    if (this.state.interfacePosition < 30) {
-      this.setState({interfacePosition: 30, overlayOpacity: 0.6});
+    if (this.state.interfacePosition < uiOffset) {
+      this.setState({interfacePosition: uiOffset, overlayOpacity: 0.6});
     }
     if (this.state.interfacePosition > 100) {
       this.setState({interfacePosition: 100, overlayOpacity: 0});
@@ -402,15 +406,16 @@ export default class App extends React.Component {
 
 }
 
+const uiOffset = 20;
 
 const styles = StyleSheet.create({
   button: {
     flex: 1,
     display: 'flex',
     alignItems: 'center',
-    backgroundColor: '#27ae60',
-    padding: 10,
-    margin: 10
+    //backgroundColor: '#27ae60',
+    // padding: 10,
+    // margin: 10
   },
   closeButton: {
     flex: 1,
