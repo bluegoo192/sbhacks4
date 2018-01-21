@@ -237,32 +237,6 @@ export default class App extends React.Component {
     return theta;
   }
 
-  // loadSigns = function(callback) {
-  //   await this.createSignTypes();
-  //   var app = this;
-  //   Location.getHeadingAsync().then(function(heading) {
-  //     var signs = [];
-  //     firebase.database().ref('signs/').on('value', function(snapshot) {
-  //         snapshot.forEach(function(childSnapshot) {
-  //           var sign = childSnapshot.val();
-  //           let childData = childSnapshot.val();
-  //           let mesh = app.createMesh(childData.type);
-  //           // var position = app.orient(heading.trueHeading, sign.latitude, sign.longitude, sign.altitude);
-  //           // console.log(position);
-  //           // cube.position.x = position[0];
-  //           // cube.position.y = position[1];
-  //           // cube.position.z = position[2];
-  //           signs.push(app.place(mesh));
-  //         });
-  //         app.setState({
-  //           signs: signList
-  //         }, function() {
-  //           callback();
-  //         });
-  //     });
-  //   });
-  // }
-
   createSignTypes = async () => {// Create a mesh for each sign type
     let tempTypes = {};
 
@@ -327,17 +301,6 @@ export default class App extends React.Component {
       });
       console.log("signs: "+signs.length);
       app.setState({signs: signs, loaded: true});
-      // for(var i = 0; i < snapshot.length; i++) {
-      //   console.log("adding");
-      //   let childSnapshot = snapshot[i];
-      //   let childData = childSnapshot.val();
-      //   let mesh = app.createMesh(childData.type);
-      //   signs.push(app.place(heading, mesh));
-      //   if (app.state.scene) {
-      //     app.state.scene.add(mesh);
-      //   }
-      // }
-      // app.setState({signs: app.state.signs.concat(signs), loaded: true});
     });
   }
 
@@ -358,18 +321,6 @@ export default class App extends React.Component {
 
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  create: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'red',
-    zIndex: 100,
-  },
   button: {
     flex: 1,
     display: 'flex',
