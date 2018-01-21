@@ -43,10 +43,9 @@ export default class App extends React.Component {
         {...this.panResponder.panHandlers}
         ref={(ref) => this._glView = ref}
         style={{ flex: 1 }}
-        onContextCreate={this._onGLContextCreate}
-        />
-        <View style={{ flex: 1, position: 'absolute', top: this.state.interfacePosition+'%', backgroundColor: '#fff' }}>
-          <Text>Test text please ignore</Text>
+        onContextCreate={this._onGLContextCreate}/>
+        <View style={{ position: 'absolute', left: 0, right: 0, justifyContent: 'center', alignItems: 'center', top: this.state.interfacePosition+'%' }}>
+          <Text style={styles.interfaceText}>Test text please ignore</Text>
           <TouchableOpacity style={styles.button} onPress={this.closeInterface}>
             <Text>Close</Text>
           </TouchableOpacity>
@@ -115,5 +114,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#DDDDDD',
     padding: 10
+  },
+  interfaceText: {
+    color: '#fff',
+    fontSize: 20
   }
 });
