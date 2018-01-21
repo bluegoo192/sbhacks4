@@ -75,7 +75,7 @@ export default class App extends React.Component {
       onPanResponderMove: (evt, gestureState) => {
         //console.log("swipe "+JSON.stringify(gestureState));
         if (this.state.interfacePosition > 30 && gestureState.dy < 0) {
-          this.setState({interfacePosition: Math.max(100 + (gestureState.dy / 2), 30) });
+          this.setState({interfacePosition: Math.max(100 + (gestureState.dy / 3), 30) });
         }
       },
       onShouldBlockNativeResponder: () => false,
@@ -92,14 +92,17 @@ export default class App extends React.Component {
         style={{ flex: 1 }}
         onContextCreate={this._onGLContextCreate}/>
         <View style={{ position: 'absolute', left: 0, right: 0, justifyContent: 'center', alignItems: 'center', top: this.state.interfacePosition+'%' }}>
-          <Text style={{ color: '#fff', fontSize: 30, fontWeight: 'bold', marginBottom: 10 }}>PathfindAR</Text>
+          <Text style={{ color: '#fff', fontSize: 30, fontWeight: 'bold', marginBottom: 20 }}>PathfindAR</Text>
           <Text style={styles.interfaceText}>Add waypoint</Text>
           <View style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: 10 }}>
             <TouchableOpacity style={styles.button} onPress={() => {this.setSign('bathroom')}}>
-              <Text style={styles.interfaceText}>Bathroom</Text>
+              <Text style={styles.interfaceTextSmall}>Bathroom</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => {this.setSign('exit')}}>
-              <Text style={styles.interfaceText}>Exit</Text>
+              <Text style={styles.interfaceTextSmall}>Exit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => {this.setSign('waterFountain')}}>
+              <Text style={styles.interfaceTextSmall}>Fountain</Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.closeButton} onPress={this.closeInterface}>
@@ -169,7 +172,10 @@ export default class App extends React.Component {
       requestAnimationFrame(animate);
       this.state.signs.forEach((sign) => {
         sign.rotation.y += 0.015;
-      })
+      });
+      if (this.state.interfacePosition < 100 && this.state.interfacePosition > 30 && !this.touching) {
+        this.setState({interfacePosition: this.state.interfacePosition - (this.state.interfacePosition / 13) });
+      }
       renderer.render(scene, camera);
       gl.endFrameEXP();
     }
@@ -233,32 +239,6 @@ export default class App extends React.Component {
     if (theta < 0) theta = 360 + theta; // range [0, 360)
     return theta;
   }
-
-  // loadSigns = function(callback) {
-  //   await this.createSignTypes();
-  //   var app = this;
-  //   Location.getHeadingAsync().then(function(heading) {
-  //     var signs = [];
-  //     firebase.database().ref('signs/').on('value', function(snapshot) {
-  //         snapshot.forEach(function(childSnapshot) {
-  //           var sign = childSnapshot.val();
-  //           let childData = childSnapshot.val();
-  //           let mesh = app.createMesh(childData.type);
-  //           // var position = app.orient(heading.trueHeading, sign.latitude, sign.longitude, sign.altitude);
-  //           // console.log(position);
-  //           // cube.position.x = position[0];
-  //           // cube.position.y = position[1];
-  //           // cube.position.z = position[2];
-  //           signs.push(app.place(mesh));
-  //         });
-  //         app.setState({
-  //           signs: signList
-  //         }, function() {
-  //           callback();
-  //         });
-  //     });
-  //   });
-  // }
 
   createSignTypes = async () => {// Create a mesh for each sign type
     let tempTypes = {};
@@ -346,17 +326,6 @@ export default class App extends React.Component {
       });
       console.log("signs: "+signs.length);
       app.setState({signs: signs, loaded: true});
-      // for(var i = 0; i < snapshot.length; i++) {
-      //   console.log("adding");
-      //   let childSnapshot = snapshot[i];
-      //   let childData = childSnapshot.val();
-      //   let mesh = app.createMesh(childData.type);
-      //   signs.push(app.place(heading, mesh));
-      //   if (app.state.scene) {
-      //     app.state.scene.add(mesh);
-      //   }
-      // }
-      // app.setState({signs: app.state.signs.concat(signs), loaded: true});
     });
   }
 
@@ -373,22 +342,11 @@ export default class App extends React.Component {
     console.log("pressed close interface");
     this.setState({interfacePosition: 100});
   }
+
 }
 
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  create: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'red',
-    zIndex: 100,
-  },
   button: {
     flex: 1,
     display: 'flex',
@@ -409,5 +367,9 @@ const styles = StyleSheet.create({
   interfaceText: {
     color: '#ecf0f1',
     fontSize: 20
+  },
+  interfaceTextSmall: {
+    color: '#ecf0f1',
+    fontSize: 16
   }
 });
