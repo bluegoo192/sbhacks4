@@ -56,8 +56,8 @@ export default class App extends React.Component {
       scene: null,
       overlayOpacity: 0,
       corwinFloor1: {
-        latitude: 34.411644,
-        longitude: -119.847859,
+        latitude: 34.411614,
+        longitude: -119.847904,
         altitude: 0
       },
       mccFloor1: {
@@ -375,7 +375,7 @@ export default class App extends React.Component {
   loadFloorPlan = async () => {
     let floorPlans = [];
     let app = this;
-    let corwinFloor1geometry = new THREE.PlaneGeometry( 400, 200, 32 );
+    let corwinFloor1geometry = new THREE.PlaneGeometry( 300, 150, 32 );
     let corwinFloor1material = new THREE.MeshLambertMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/floorplan.png')),
@@ -384,7 +384,7 @@ export default class App extends React.Component {
       transparent: true,
       opacity: 0.8
     });
-    let corwinFloor1plane = new THREE.Mesh( geometry, material );
+    let corwinFloor1plane = new THREE.Mesh( corwinFloor1geometry, corwinFloor1material );
     corwinFloor1plane.rotateX(Math.PI / 2);
     corwinFloor1plane.position.y -= 4;
     let corwinFloor1position = app.orient(app.state.heading.trueHeading, app.state.corwinFloor1.latitude, app.state.corwinFloor1.longitude, app.state.corwinFloor1.altitude);
@@ -395,7 +395,7 @@ export default class App extends React.Component {
     this.state.scene.add( corwinFloor1plane );
     floorPlans.push(corwinFloor1plane);
 
-    let mccFloor1geometry = new THREE.PlaneGeometry( 400, 200, 32 );
+    let mccFloor1geometry = new THREE.PlaneGeometry( 150, 300, 32 );
     let mccFloor1material = new THREE.MeshLambertMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/floorplanb.png')),
@@ -404,7 +404,7 @@ export default class App extends React.Component {
       transparent: true,
       opacity: 0.8
     });
-    let mccFloor1plane = new THREE.Mesh( geometry, material );
+    let mccFloor1plane = new THREE.Mesh( mccFloor1geometry, mccFloor1material );
     mccFloor1plane.rotateX(Math.PI / 2);
     mccFloor1plane.position.y -= 4;
     let mccFloor1position = app.orient(app.state.heading.trueHeading, app.state.mccFloor1.latitude, app.state.mccFloor1.longitude, app.state.mccFloor1.altitude);
