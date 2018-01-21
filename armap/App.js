@@ -39,11 +39,16 @@ export default class App extends React.Component {
           longitude: -119.84705,
           altitude: 14
         },
-        stage: {
-          latitude: 34.411514,
-          longitude: -119.846795,
-          altitude: 20
+        test: {
+          latitude: 34.411622,
+          longitude: -119.846921,
+          altitude: 14
         },
+        stage: {
+          latitude: 34.411622,
+          longitude: -119.846921,
+          altitude: 14
+        }
       },
       camera: null,
       multiplier: 0.57,
@@ -51,8 +56,8 @@ export default class App extends React.Component {
       scene: null,
       overlayOpacity: 0,
       corwinFloor1: {
-        latitude: 34.411629,
-        longitude: -119.847158,
+        latitude: 34.411644,
+        longitude: -119.847859,
         altitude: 5
       },
       floorPlans: [],
@@ -344,7 +349,7 @@ export default class App extends React.Component {
 
   loadFloorPlan = async () => {
     let app = this;
-    let geometry = new THREE.PlaneGeometry( 80, 40, 32 );
+    let geometry = new THREE.PlaneGeometry( 300, 150, 32 );
     let material = new THREE.MeshLambertMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/floorplan.png')),
