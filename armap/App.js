@@ -323,13 +323,22 @@ export default class App extends React.Component {
     tempTypes.stairs = {geometry: stairsGeometry, material: stairsMaterial};
 
     //podium
-    const podiumGeometry = new THREE.BoxGeometry(1, 1, 1);
+    const podiumGeometry = new THREE.BoxGeometry(1.3, 1.3, 1.3);
     var podiumMaterial = new THREE.MeshBasicMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/podium.jpg')),
       })
     });
     tempTypes.podium = {geometry: podiumGeometry, material: podiumMaterial};
+
+    //elevator
+    const elevatorGeometry = new THREE.BoxGeometry(0.8, 1.3, 0.8);
+    var elevatorMaterial = new THREE.MeshBasicMaterial({
+      map: await ExpoTHREE.createTextureAsync({
+        asset: Expo.Asset.fromModule(require('./assets/elevator.png')),
+      })
+    });
+    tempTypes.elevator = {geometry: elevatorGeometry, material: elevatorMaterial};
 
     this.setState({signTypes: tempTypes});
   }
