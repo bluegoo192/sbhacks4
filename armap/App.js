@@ -95,13 +95,16 @@ export default class App extends React.Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
+        <View style={{ top: 0, backgroundColor: '#27ae60', alignItems: 'center', paddingTop: 7 }}>
+          <Text style={{ fontFamily: 'Bodoni 72', margin: 10, alignItems: 'center', fontSize: 20, color: '#fff', fontStyle: 'italic' }}>Pathfind<Text style={{ fontWeight: 'bold', fontStyle: 'normal', fontFamily: 'Avenir' }}>AR</Text></Text>
+        </View>
         <Expo.GLView
         {...this.panResponder.panHandlers}
         ref={(ref) => this._glView = ref}
         style={{ flex: 1 }}
         onContextCreate={this._onGLContextCreate}/>
         <View style={{ position: 'absolute', left: 0, right: 0, justifyContent: 'center', alignItems: 'center', top: this.state.interfacePosition+'%' }}>
-          <Text style={{ color: '#fff', fontSize: 30, fontWeight: 'bold', marginBottom: 20 }}>PathfindAR</Text>
+          <Text style={{ fontFamily: 'Bodoni 72', margin: 10, alignItems: 'center', fontSize: 50, color: '#fff', fontStyle: 'italic' }}>Pathfind<Text style={{ fontWeight: 'bold', fontStyle: 'normal', fontFamily: 'Avenir' }}>AR</Text></Text>
           <TouchableOpacity style={styles.button} onPress={this.loadFloorPlan}>
             <Text style={styles.interfaceTextSmall}>Show floor plan</Text>
           </TouchableOpacity>
