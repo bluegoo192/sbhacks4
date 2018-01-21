@@ -211,8 +211,8 @@ export default class App extends React.Component {
     console.log("absolute angle is " + absoluteAngle);
     var z = zMultiplier * Math.cos(this.toRadians(absoluteAngle)) * distance * this.state.multiplier;
     var x = xMultiplier * Math.sin(this.toRadians(absoluteAngle)) * distance * this.state.multiplier;
-    var y = (alt - current.altitude) / 10;
-    return [x, y, z];
+    var y = (alt - current.altitude);
+    return [x, y, z, distance];
   }
 
   distance = function(lat1, lon1, lat2, lon2) {
@@ -284,6 +284,15 @@ export default class App extends React.Component {
     });
     tempTypes.exit = {geometry: exitGeometry, material: exitMaterial};
 
+    //water fountain
+    const waterFountainGeometry = new THREE.BoxGeometry(1, 1, 1);
+    var waterFountainMaterial = new THREE.MeshBasicMaterial({
+      map: await ExpoTHREE.createTextureAsync({
+        asset: Expo.Asset.fromModule(require('./assets/water_fountain.png')),
+      })
+    });
+    tempTypes.waterFountain = {geometry: waterFountainGeometry, material: waterFountainMaterial};
+
     this.setState({signTypes: tempTypes});
   }
 
@@ -295,6 +304,7 @@ export default class App extends React.Component {
   place = (heading, mesh, sign) => {
     let app = this;
     let position = app.orient(heading.trueHeading, sign.latitude, sign.longitude, sign.altitude);
+    mesh.material.opacity = 0.5;
     mesh.position.x = position[0];
     mesh.position.y = position[1];
     mesh.position.z = position[2];
