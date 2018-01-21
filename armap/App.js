@@ -37,6 +37,7 @@ export default class App extends React.Component {
       onStartShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {
         this.touching = true;
+        this.setSign("oh yoyoyo");
       },
       onPanResponderRelease: () => {
         this.touching = false;
@@ -55,6 +56,7 @@ export default class App extends React.Component {
       onShouldBlockNativeResponder: () => false,
     });
     this.loadSigns();
+    this._getLocationAsync();
   }
 
   render() {
@@ -73,24 +75,6 @@ export default class App extends React.Component {
         </View>
       </View>
     );
-  }
-
-  componentWillMount() {
-    this.panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        // this.state.cube.position.x = this.state.camera.position.x;
-        // this.state.cube.position.y = this.state.camera.position.y;
-        // this.state.cube.position.z = this.state.camera.position.z - 0.1;
-        this.setSign("oh yoyoyo");
-      },
-      onPanResponderRelease: () => {
-      },
-      onPanResponderTerminate: () => {
-      },
-      onShouldBlockNativeResponder: () => false,
-    });
-    this._getLocationAsync();
   }
 
   _getLocationAsync = async () => {
