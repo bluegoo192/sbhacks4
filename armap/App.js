@@ -73,7 +73,7 @@ export default class App extends React.Component {
         onContextCreate={this._onGLContextCreate}/>
         <View style={{ position: 'absolute', left: 0, right: 0, justifyContent: 'center', alignItems: 'center', top: this.state.interfacePosition+'%' }}>
           <Text style={styles.interfaceText}>Test text please ignore</Text>
-          <TouchableOpacity style={styles.button} onPress={() => {this.setSign('bathroom')}}>
+          <TouchableOpacity style={styles.button} onPress={() => {this.setSign('exit')}}>
             <Text>Add bathroom sign</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={this.closeInterface}>
@@ -157,14 +157,25 @@ export default class App extends React.Component {
 
   createSignTypes = async () => {// Create a mesh for each sign type
     let tempTypes = {};
-    const _geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
-    var _material = new THREE.MeshBasicMaterial({
+
+    //bathroom
+    const bathroomGeometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
+    var bathroomMaterial = new THREE.MeshBasicMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/restroom_signs_unisex.jpg')),
       })
     });
-    // const bathroomCube = new THREE.Mesh(_geometry, _material);
-    tempTypes.bathroom = {geometry: _geometry, material: _material};
+    tempTypes.bathroom = {geometry: bathroomGeometry, material: bathroomMaterial};
+
+    //exit
+    const exitGeometry = new THREE.BoxGeometry(0.1, 0.06, 0.03);
+    const exitMaterial = new THREE.MeshBasicMaterial({
+      map: await ExpoTHREE.createTextureAsync({
+        asset: Expo.Asset.fromModule(require('./assets/exit.jpg'))
+      })
+    });
+    tempTypes.exit = {geometry: exitGeometry, material: exitMaterial};
+
     this.setState({signTypes: tempTypes});
   }
 
