@@ -150,7 +150,7 @@ export default class App extends React.Component {
     const cube = new THREE.Mesh(geometry, material);
     cube.position.x = 0;
     cube.position.y = 0;
-    cube.position.z = -0.4;
+    cube.position.z = 1;
     this.setState({signs: this.state.signs.concat([cube]), loaded: true});
   }
 
