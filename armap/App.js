@@ -75,7 +75,7 @@ export default class App extends React.Component {
       onPanResponderMove: (evt, gestureState) => {
         //console.log("swipe "+JSON.stringify(gestureState));
         if (this.state.interfacePosition > 30 && gestureState.dy < 0) {
-          this.setState({interfacePosition: Math.max(100 + (gestureState.dy / 2), 30) });
+          this.setState({interfacePosition: Math.max(100 + (gestureState.dy / 3), 30) });
         }
       },
       onShouldBlockNativeResponder: () => false,
@@ -96,10 +96,13 @@ export default class App extends React.Component {
           <Text style={styles.interfaceText}>Add waypoint</Text>
           <View style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: 10 }}>
             <TouchableOpacity style={styles.button} onPress={() => {this.setSign('bathroom')}}>
-              <Text style={styles.interfaceText}>Bathroom</Text>
+              <Text style={styles.interfaceTextSmall}>Bathroom</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => {this.setSign('exit')}}>
-              <Text style={styles.interfaceText}>Exit</Text>
+              <Text style={styles.interfaceTextSmall}>Exit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => {this.setSign('waterFountain')}}>
+              <Text style={styles.interfaceTextSmall}>Fountain</Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.closeButton} onPress={this.closeInterface}>
@@ -169,7 +172,10 @@ export default class App extends React.Component {
       requestAnimationFrame(animate);
       this.state.signs.forEach((sign) => {
         sign.rotation.y += 0.015;
-      })
+      });
+      if (this.state.interfacePosition < 100 && this.state.interfacePosition > 30 && !this.touching) {
+        this.setState({interfacePosition: this.state.interfacePosition - (this.state.interfacePosition / 13) });
+      }
       renderer.render(scene, camera);
       gl.endFrameEXP();
     }
@@ -341,5 +347,9 @@ const styles = StyleSheet.create({
   interfaceText: {
     color: '#ecf0f1',
     fontSize: 20
+  },
+  interfaceTextSmall: {
+    color: '#ecf0f1',
+    fontSize: 16
   }
 });
