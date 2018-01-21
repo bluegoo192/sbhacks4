@@ -54,7 +54,7 @@ export default class App extends React.Component {
       onPanResponderMove: (evt, gestureState) => {
         //console.log("swipe "+JSON.stringify(gestureState));
         if (this.state.interfacePosition > 30 && gestureState.dy < 0) {
-          this.setState({interfacePosition: Math.max(100 + gestureState.dy, 30) });
+          this.setState({interfacePosition: Math.max(100 + (gestureState.dy / 2), 30) });
         }
       },
       onShouldBlockNativeResponder: () => false,
@@ -210,7 +210,7 @@ export default class App extends React.Component {
             app.state.scene.add(mesh);
           }
         });
-        app.setState({signs: app.state.signs.concat(signs), loaded: true});
+        app.setState({signs: app.state.signs.concat(signs), loaded: true});  //TODO: remove concat
     });
   }
 
