@@ -72,17 +72,18 @@ export default class App extends React.Component {
         style={{ flex: 1 }}
         onContextCreate={this._onGLContextCreate}/>
         <View style={{ position: 'absolute', left: 0, right: 0, justifyContent: 'center', alignItems: 'center', top: this.state.interfacePosition+'%' }}>
+          <Text style={{ color: '#fff', fontSize: 30, fontWeight: 'bold', marginBottom: 10 }}>PathfindAR</Text>
           <Text style={styles.interfaceText}>Add waypoint</Text>
-          <View style={{ display: 'flex', flexDirection: 'horizontal', width: '100%' }}>
+          <View style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: 10 }}>
             <TouchableOpacity style={styles.button} onPress={() => {this.setSign('bathroom')}}>
-              <Text>Bathroom</Text>
+              <Text style={styles.interfaceText}>Bathroom</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => {this.setSign('exit')}}>
-              <Text>Exit</Text>
+              <Text style={styles.interfaceText}>Exit</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.button} onPress={this.closeInterface}>
-            <Text>Close</Text>
+          <TouchableOpacity style={styles.closeButton} onPress={this.closeInterface}>
+            <Text style={styles.interfaceText}>Close</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -246,11 +247,25 @@ const styles = StyleSheet.create({
     flex: 1,
     display: 'flex',
     alignItems: 'center',
-    backgroundColor: '#DDDDDD',
-    padding: 10
+    backgroundColor: '#27ae60',
+    color: '#ecf0f1',
+    fontSize: 20,
+    padding: 10,
+    margin: 10
+  },
+  closeButton: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#ecf0f1',
+    color: '#ecf0f1',
+    fontSize: 20,
+    padding: 10,
+    margin: 10
   },
   interfaceText: {
-    color: '#fff',
+    color: '#ecf0f1',
     fontSize: 20
   }
 });
