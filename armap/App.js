@@ -41,7 +41,7 @@ export default class App extends React.Component {
       onStartShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {
         this.touching = true;
-        this.setSign("bathroom");
+        // this.setSign("bathroom");
       },
       onPanResponderRelease: () => {
         this.touching = false;
@@ -73,6 +73,9 @@ export default class App extends React.Component {
         onContextCreate={this._onGLContextCreate}/>
         <View style={{ position: 'absolute', left: 0, right: 0, justifyContent: 'center', alignItems: 'center', top: this.state.interfacePosition+'%' }}>
           <Text style={styles.interfaceText}>Test text please ignore</Text>
+          <TouchableOpacity style={styles.button} onPress={() => {this.setSign('bathroom')}}>
+            <Text>Add bathroom sign</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={this.closeInterface}>
             <Text>Close</Text>
           </TouchableOpacity>
@@ -204,6 +207,7 @@ export default class App extends React.Component {
   }
 
   closeInterface = () => {
+    console.log("pressed close interface");
     this.setState({interfacePosition: 100});
   }
 }
