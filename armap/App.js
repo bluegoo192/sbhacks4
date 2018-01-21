@@ -35,8 +35,8 @@ export default class App extends React.Component {
           altitude: 20
         },
         demo: {
-          latitude: 34.411635,
-          longitude: -119.84705,
+          latitude: 34.411669,
+          longitude: -119.847047,
           altitude: 14
         },
         test: {
@@ -58,7 +58,12 @@ export default class App extends React.Component {
       corwinFloor1: {
         latitude: 34.411644,
         longitude: -119.847859,
-        altitude: 5
+        altitude: 0
+      },
+      mccFloor1: {
+        latitude: 34.411602,
+        longitude: -119.846647,
+        altitude: 0
       },
       floorPlans: [],
       floorPlanLoaded: false
@@ -224,7 +229,7 @@ export default class App extends React.Component {
 
 
   orient = function(heading, lat, long, alt) {
-    var current = this.state.locations.work;
+    var current = this.state.locations.demo;
     var distance = this.distance(current.latitude, current.longitude, lat, long);
     var angle = this.angle(current.longitude, current.latitude, long, lat);
     var absoluteAngle = heading - (-1 * angle + 90);
@@ -344,9 +349,10 @@ export default class App extends React.Component {
   }
 
   loadFloorPlan = async () => {
+    let floorPlans = [];
     let app = this;
-    let geometry = new THREE.PlaneGeometry( 300, 150, 32 );
-    let material = new THREE.MeshLambertMaterial({
+    let corwinFloor1geometry = new THREE.PlaneGeometry( 400, 200, 32 );
+    let corwinFloor1material = new THREE.MeshLambertMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/floorplan.png')),
       }),
@@ -354,16 +360,38 @@ export default class App extends React.Component {
       transparent: true,
       opacity: 0.8
     });
-    let plane = new THREE.Mesh( geometry, material );
-    plane.rotateX(Math.PI / 2);
-    plane.position.y -= 4;
-    let position = app.orient(app.state.heading.trueHeading, app.state.corwinFloor1.latitude, app.state.corwinFloor1.longitude, app.state.corwinFloor1.altitude);
-    plane.position.x = position[0];
-    plane.position.y = position[1];
-    plane.position.z = position[2];
-    plane.rotation.z = this.toRadians((-1 * app.state.heading.trueHeading));
-    this.state.scene.add( plane );
-    this.setState({floorPlans: [plane]});
+    let corwinFloor1plane = new THREE.Mesh( geometry, material );
+    corwinFloor1plane.rotateX(Math.PI / 2);
+    corwinFloor1plane.position.y -= 4;
+    let corwinFloor1position = app.orient(app.state.heading.trueHeading, app.state.corwinFloor1.latitude, app.state.corwinFloor1.longitude, app.state.corwinFloor1.altitude);
+    corwinFloor1plane.position.x = corwinFloor1position[0];
+    corwinFloor1plane.position.y = corwinFloor1position[1];
+    corwinFloor1plane.position.z = corwinFloor1position[2];
+    corwinFloor1plane.rotation.z = this.toRadians((-1 * app.state.heading.trueHeading));
+    this.state.scene.add( corwinFloor1plane );
+    floorPlans.push(corwinFloor1plane);
+
+    let mccFloor1geometry = new THREE.PlaneGeometry( 400, 200, 32 );
+    let mccFloor1material = new THREE.MeshLambertMaterial({
+      map: await ExpoTHREE.createTextureAsync({
+        asset: Expo.Asset.fromModule(require('./assets/floorplanb.png')),
+      }),
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.8
+    });
+    let mccFloor1plane = new THREE.Mesh( geometry, material );
+    mccFloor1plane.rotateX(Math.PI / 2);
+    mccFloor1plane.position.y -= 4;
+    let mccFloor1position = app.orient(app.state.heading.trueHeading, app.state.mccFloor1.latitude, app.state.mccFloor1.longitude, app.state.mccFloor1.altitude);
+    mccFloor1plane.position.x = mccFloor1position[0];
+    mccFloor1plane.position.y = mccFloor1position[1];
+    mccFloor1plane.position.z = mccFloor1position[2];
+    mccFloor1plane.rotation.z = this.toRadians((-1 * app.state.heading.trueHeading));
+    this.state.scene.add( mccFloor1plane );
+    floorPlans.push(mccFloor1plane);
+
+    this.setState({floorPlans: floorPlans});
   }
 
   loadSigns = async () => {
