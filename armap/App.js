@@ -322,6 +322,15 @@ export default class App extends React.Component {
     });
     tempTypes.stairs = {geometry: stairsGeometry, material: stairsMaterial};
 
+    //podium
+    const podiumGeometry = new THREE.BoxGeometry(1, 1, 1);
+    var podiumMaterial = new THREE.MeshBasicMaterial({
+      map: await ExpoTHREE.createTextureAsync({
+        asset: Expo.Asset.fromModule(require('./assets/podium.jpg')),
+      })
+    });
+    tempTypes.podium = {geometry: podiumGeometry, material: podiumMaterial};
+
     this.setState({signTypes: tempTypes});
   }
 
