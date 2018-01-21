@@ -28,7 +28,10 @@ export default class App extends React.Component {
       signs: [],
       location: null,
       cube: null,
-      camera: null
+      camera: null,
+      latitude: 0,
+      longitude: 0,
+      altitude: 0
     };
   }
 
@@ -145,8 +148,12 @@ export default class App extends React.Component {
 
     scene.background = ExpoTHREE.createARBackgroundTexture(arSession, renderer);
 
-    const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.02);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
+    var material = new THREE.MeshBasicMaterial({
+      map: await ExpoTHREE.createTextureAsync({
+        asset: Expo.Asset.fromModule(require('./assets/restroom_signs_unisex.jpg')),
+      })
+    });
     const cube = new THREE.Mesh(geometry, material);
     cube.position.z = -0.4;
     scene.add(cube);
@@ -161,7 +168,7 @@ export default class App extends React.Component {
 
     const animate = () => {
       requestAnimationFrame(animate);
-      this.state.cube.rotation.y += 0.04;
+      cube.rotation.y += 0.04;
       renderer.render(scene, camera);
       gl.endFrameEXP();
     }
@@ -169,6 +176,11 @@ export default class App extends React.Component {
   }
 
   loadSigns = async () => {
+    firebase.database().ref('signs/').on('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          var childData = childSnapshot.val();
+        });
+    });
     // get signs from Firebase
     const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
