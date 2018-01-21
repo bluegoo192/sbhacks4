@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8>
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="three.js"></script>
+		<script>
+			// Our Javascript will go here.
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+      var loader = new THREE.FontLoader();
+
+
+
+      var renderer = new THREE.WebGLRenderer();
+      renderer.setSize( window.innerWidth, window.innerHeight );
+      document.body.appendChild( renderer.domElement );
+      //var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+      var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+      //var cube = new THREE.Mesh( geometry, material );
+      var text = null;
+      // scene.add( cube );
+      loader.load( 'helvetiker_bold.typeface.json', function ( font ) {
+        var geometry = new THREE.TextGeometry( 'a', {
+          font: font,
+          size: 1,
+          height: 5,
+          curveSegments: 12,
+          bevelEnabled: true,
+          bevelThickness: 10,
+          bevelSize: 8,
+          bevelSegments: 5
+        } );
+        text = new THREE.Mesh( geometry, material );
+        scene.add(text);
+        console.log("added");
+      }, function (xhr) {
+        console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+      }, function (err) {
+        console.log(err);
+      } );
+      camera.position.z = 30;
+      function animate() {
+      	requestAnimationFrame( animate );
+				text.rotation.x += 0.01;
+				text.rotation.y += 0.01;
+				text.rotation.z += 0.01;
+      	renderer.render( scene, camera );
+      }
+      animate();
+		</script>
+	</body>
+</html>

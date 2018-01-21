@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import ExpoTHREE from 'expo-three';
 import Expo from 'expo';
 import { Constants, Location, Permissions } from 'expo';
-import { StyleSheet, Text, View, Button, PanResponder, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Button, PanResponder, TouchableOpacity, Picker } from 'react-native';
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -25,6 +25,7 @@ export default class App extends React.Component {
     this.state = {
       interfacePosition: 100,
       loaded: false,
+      signTypes: {},
       signs: [],
       locations: {
         work: {
@@ -44,7 +45,8 @@ export default class App extends React.Component {
         },
       },
       camera: null,
-      multiplier: 0.5
+      multiplier: 0.5,
+      scene: null
     };
   }
 
@@ -60,6 +62,7 @@ export default class App extends React.Component {
         // }).then(function(location) {
         //   console.log("LOCATION: " + location.coords.latitude + ", " + location.coords.longitude);
         // });
+        // this.setSign("bathroom");
       },
       onPanResponderRelease: () => {
         this.touching = false;
@@ -77,6 +80,7 @@ export default class App extends React.Component {
       },
       onShouldBlockNativeResponder: () => false,
     });
+    this.loadSigns();
   }
 
   render() {
@@ -88,9 +92,18 @@ export default class App extends React.Component {
         style={{ flex: 1 }}
         onContextCreate={this._onGLContextCreate}/>
         <View style={{ position: 'absolute', left: 0, right: 0, justifyContent: 'center', alignItems: 'center', top: this.state.interfacePosition+'%' }}>
-          <Text style={styles.interfaceText}>Test text please ignore</Text>
-          <TouchableOpacity style={styles.button} onPress={this.closeInterface}>
-            <Text>Close</Text>
+          <Text style={{ color: '#fff', fontSize: 30, fontWeight: 'bold', marginBottom: 10 }}>PathfindAR</Text>
+          <Text style={styles.interfaceText}>Add waypoint</Text>
+          <View style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: 10 }}>
+            <TouchableOpacity style={styles.button} onPress={() => {this.setSign('bathroom')}}>
+              <Text style={styles.interfaceText}>Bathroom</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => {this.setSign('exit')}}>
+              <Text style={styles.interfaceText}>Exit</Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={styles.closeButton} onPress={this.closeInterface}>
+            <Text style={styles.interfaceText}>Close</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -109,14 +122,14 @@ export default class App extends React.Component {
     // app.setState({ location: location });
   };
 
-  setSign = async (text) => {
+  setSign = async (signType) => {
     Location.getCurrentPositionAsync({
       enableHighAccuracy: true
     }).then(function(location) {
       var id = location.coords.latitude.toString().replace(".", "-") + "&" + location.coords.longitude.toString().replace(".", "-") + "&" + location.coords.altitude.toString().replace(".", "-");
       console.log(id);
       firebase.database().ref('signs/' + id).set({
-        text: text,
+        type: signType,
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
         altitude: location.coords.altitude,
@@ -142,35 +155,25 @@ export default class App extends React.Component {
 
     scene.background = ExpoTHREE.createARBackgroundTexture(arSession, renderer);
 
-    // const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
-    // var material = new THREE.MeshBasicMaterial({
-    //   map: await ExpoTHREE.createTextureAsync({
-    //     asset: Expo.Asset.fromModule(require('./assets/restroom_signs_unisex.jpg')),
-    //   })
-    // });
-    // const cube = new THREE.Mesh(geometry, material);
-    // cube.position.z = -0.5;
-    // scene.add(cube);
     this.setState({
-      camera: camera
+      camera: camera,
+      scene: scene
     });
     var app = this;
-    this.loadSigns(function() {
-      app.state.signs.forEach((sign) => {
-        scene.add(sign);
-        console.log("Added a sign");
-      });
-
-      const animate = () => {
-        requestAnimationFrame(animate);
-        app.state.signs.forEach((sign) => {
-          sign.rotation.y += 0.04;
-        })
-        renderer.render(scene, camera);
-        gl.endFrameEXP();
-      }
-      animate();
+    this.state.signs.forEach((sign) => {
+      scene.add(sign);
+      console.log("Added a sign");
     });
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+      this.state.signs.forEach((sign) => {
+        sign.rotation.y += 0.015;
+      })
+      renderer.render(scene, camera);
+      gl.endFrameEXP();
+    }
+    animate();
   }
 
   toRadians = function(angle) {
@@ -234,29 +237,97 @@ export default class App extends React.Component {
     return theta;
   }
 
-  loadSigns = function(callback) {
-    var app = this;
-    Location.getHeadingAsync().then(function(heading) {
-      var signList = [];
-      firebase.database().ref('signs/').on('value', function(snapshot) {
-          snapshot.forEach(function(childSnapshot) {
-            var sign = childSnapshot.val();
-            const geometry = new THREE.BoxGeometry(1, 1, 1);
-            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-            const cube = new THREE.Mesh(geometry, material);
-            var position = app.orient(heading.trueHeading, sign.latitude, sign.longitude, sign.altitude);
-            console.log(position);
-            cube.position.x = position[0];
-            cube.position.y = position[1];
-            cube.position.z = position[2];
-            signList.push(cube);
-          });
-          app.setState({
-            signs: signList
-          }, function() {
-            callback();
-          });
+  // loadSigns = function(callback) {
+  //   await this.createSignTypes();
+  //   var app = this;
+  //   Location.getHeadingAsync().then(function(heading) {
+  //     var signs = [];
+  //     firebase.database().ref('signs/').on('value', function(snapshot) {
+  //         snapshot.forEach(function(childSnapshot) {
+  //           var sign = childSnapshot.val();
+  //           let childData = childSnapshot.val();
+  //           let mesh = app.createMesh(childData.type);
+  //           // var position = app.orient(heading.trueHeading, sign.latitude, sign.longitude, sign.altitude);
+  //           // console.log(position);
+  //           // cube.position.x = position[0];
+  //           // cube.position.y = position[1];
+  //           // cube.position.z = position[2];
+  //           signs.push(app.place(mesh));
+  //         });
+  //         app.setState({
+  //           signs: signList
+  //         }, function() {
+  //           callback();
+  //         });
+  //     });
+  //   });
+  // }
+
+  createSignTypes = async () => {// Create a mesh for each sign type
+    let tempTypes = {};
+
+    //bathroom
+    const bathroomGeometry = new THREE.BoxGeometry(1, 1, 1);
+    var bathroomMaterial = new THREE.MeshBasicMaterial({
+      map: await ExpoTHREE.createTextureAsync({
+        asset: Expo.Asset.fromModule(require('./assets/restroom_signs_unisex.jpg')),
+      })
+    });
+    tempTypes.bathroom = {geometry: bathroomGeometry, material: bathroomMaterial};
+
+    //exit
+    const exitGeometry = new THREE.BoxGeometry(1, 0.6, 0.3);
+    const exitMaterial = new THREE.MeshBasicMaterial({
+      map: await ExpoTHREE.createTextureAsync({
+        asset: Expo.Asset.fromModule(require('./assets/exit.jpg'))
+      })
+    });
+    tempTypes.exit = {geometry: exitGeometry, material: exitMaterial};
+
+    this.setState({signTypes: tempTypes});
+  }
+
+  createMesh = (type) => {
+    let template = this.state.signTypes[type];
+    return new THREE.Mesh(template.geometry, template.material);
+  }
+
+  place = (heading, mesh, sign) => {
+    let app = this;
+    let position = app.orient(heading.trueHeading, sign.latitude, sign.longitude, sign.altitude);
+    mesh.position.x = position[0];
+    mesh.position.y = position[1];
+    mesh.position.z = position[2];
+    return mesh;
+  }
+
+  loadSigns = async () => {
+    await this.createSignTypes();
+    let heading = await Location.getHeadingAsync();
+    let signs = [];
+    let app = this;
+    firebase.database().ref('signs/').on('value', (snapshot) => {
+      snapshot.forEach(function(childSnapshot) {
+        let childData = childSnapshot.val();
+        let mesh = app.createMesh(childData.type);
+        signs.push(app.place(heading, mesh, childData));
+        if (app.state.scene) {
+          app.state.scene.add(mesh);
+        }
       });
+      console.log("signs: "+signs.length);
+      app.setState({signs: signs, loaded: true});
+      // for(var i = 0; i < snapshot.length; i++) {
+      //   console.log("adding");
+      //   let childSnapshot = snapshot[i];
+      //   let childData = childSnapshot.val();
+      //   let mesh = app.createMesh(childData.type);
+      //   signs.push(app.place(heading, mesh));
+      //   if (app.state.scene) {
+      //     app.state.scene.add(mesh);
+      //   }
+      // }
+      // app.setState({signs: app.state.signs.concat(signs), loaded: true});
     });
   }
 
@@ -270,6 +341,7 @@ export default class App extends React.Component {
   }
 
   closeInterface = () => {
+    console.log("pressed close interface");
     this.setState({interfacePosition: 100});
   }
 }
@@ -289,12 +361,24 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   button: {
+    flex: 1,
+    display: 'flex',
     alignItems: 'center',
-    backgroundColor: '#DDDDDD',
-    padding: 10
+    backgroundColor: '#27ae60',
+    padding: 10,
+    margin: 10
+  },
+  closeButton: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#ecf0f1',
+    padding: 10,
+    margin: 10
   },
   interfaceText: {
-    color: '#fff',
+    color: '#ecf0f1',
     fontSize: 20
   }
 });
