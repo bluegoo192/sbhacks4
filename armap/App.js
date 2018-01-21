@@ -137,11 +137,10 @@ export default class App extends React.Component {
       camera: camera,
       scene: scene
     });
-    // this.state.signs.forEach((sign) => {
-    //   scene.add(sign);
-    // });
+    this.state.signs.forEach((sign) => {
+      scene.add(sign);
+    });
 
-    console.log("Finished adding signs to scene");
     const animate = () => {
       requestAnimationFrame(animate);
       this.state.signs.forEach((sign) => {
@@ -172,9 +171,9 @@ export default class App extends React.Component {
   }
 
   place = (mesh) => {
-    mesh.position.x = Math.random();
-    mesh.position.y = Math.random();
-    mesh.position.z = Math.random();
+    mesh.position.x = Math.random() / 3;
+    mesh.position.y = Math.random() / 3;
+    mesh.position.z = Math.random() / 3;
     return mesh;
   }
 
@@ -188,27 +187,11 @@ export default class App extends React.Component {
           let mesh = app.createMesh(childData.type);
           signs.push(app.place(mesh));
           if (app.state.scene) {
-            console.log("Pushed a sign");
             app.state.scene.add(mesh);
           }
         });
         app.setState({signs: app.state.signs.concat(signs), loaded: true});
-        console.log("Set state with updated signs")
     });
-    // let cube = this.createMesh("bathroom");
-    // cube.position.z = 0.3;
-    // signs.push(cube);
-    // let cube2 = this.createMesh("bathroom");
-    // cube2.position.z = 0.5;
-    // signs.push(cube2);
-    // get signs from Firebase
-    // const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
-    // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    // const cube = new THREE.Mesh(geometry, material);
-    // cube.position.x = 0;
-    // cube.position.y = 0;
-    // cube.position.z = -0.4;
-    // this.setState({signs: this.state.signs.concat(signs), loaded: true});
   }
 
   validateInterfacePosition = () => {
