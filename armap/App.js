@@ -104,6 +104,9 @@ export default class App extends React.Component {
         style={{ flex: 1 }}
         onContextCreate={this._onGLContextCreate}/>
         <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: '#2c3e50', opacity: this.state.overlayOpacity }} />
+        <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: '#2c3e50', alignItems: 'center', justifyContent: 'center', display: this.state.loaded ? 'none' : 'flex' }}>
+          <Text style={{ fontFamily: 'Bodoni 72', margin: 10, alignItems: 'center', fontSize: 50, color: '#fff', fontStyle: 'italic' }}>Pathfind<Text style={{ fontWeight: 'bold', fontStyle: 'normal', fontFamily: 'Avenir' }}>AR</Text></Text>
+        </View>
         <View style={{ position: 'absolute', left: 0, right: 0, justifyContent: 'center', alignItems: 'center', top: this.state.interfacePosition+'%' }}>
           <Text style={{ fontFamily: 'Bodoni 72', margin: 10, alignItems: 'center', fontSize: 50, color: '#fff', fontStyle: 'italic' }}>Pathfind<Text style={{ fontWeight: 'bold', fontStyle: 'normal', fontFamily: 'Avenir' }}>AR</Text></Text>
           <TouchableOpacity style={styles.button} onPress={this.loadFloorPlan}>
