@@ -27,20 +27,41 @@ export default class App extends React.Component {
       loaded: false,
       signTypes: {},
       signs: [],
-      location: null,
+      locations: {
+        work: {
+          latitude: 34.411514,
+          longitude: -119.846795,
+          altitude: 20
+        },
+        demo: {
+          latitude: 34.411514,
+          longitude: -119.846795,
+          altitude: 20
+        },
+        stage: {
+          latitude: 34.411514,
+          longitude: -119.846795,
+          altitude: 20
+        },
+      },
       camera: null,
-      latitude: 0,
-      longitude: 0,
-      altitude: 0,
+      multiplier: 0.5,
       scene: null
     };
   }
 
   componentWillMount() {
+    this._getLocationAsync();
     this.panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {
         this.touching = true;
+        // this.setSign("oh yoyoyo");
+        // var location = Location.getCurrentPositionAsync({
+        //   enableHighAccuracy: true
+        // }).then(function(location) {
+        //   console.log("LOCATION: " + location.coords.latitude + ", " + location.coords.longitude);
+        // });
         // this.setSign("bathroom");
       },
       onPanResponderRelease: () => {
@@ -60,7 +81,6 @@ export default class App extends React.Component {
       onShouldBlockNativeResponder: () => false,
     });
     this.loadSigns();
-    this._getLocationAsync();
   }
 
   render() {
@@ -91,28 +111,21 @@ export default class App extends React.Component {
   }
 
   _getLocationAsync = async () => {
-    var app = this;
-    let { status } = await Permissions.askAsync(Permissions.LOCATION);
-    if (status !== 'granted') {
-      this.setState({
-        errorMessage: 'Permission to access location was denied',
-      });
-    }
-
-    var location = await Location.getCurrentPositionAsync({
-      enableHighAccuracy: true
-    });
-    app.setState({ location: location });
-    console.log(location);
+    // var app = this;
+    // let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    // if (status !== 'granted') {
+    //   this.setState({
+    //     errorMessage: 'Permission to access location was denied',
+    //   });
+    // }
+    //
+    // app.setState({ location: location });
   };
 
   setSign = async (signType) => {
     Location.getCurrentPositionAsync({
       enableHighAccuracy: true
     }).then(function(location) {
-      // Location.getHeadingAsync().then(function(heading)) {
-      //
-      // }
       var id = location.coords.latitude.toString().replace(".", "-") + "&" + location.coords.longitude.toString().replace(".", "-") + "&" + location.coords.altitude.toString().replace(".", "-");
       console.log(id);
       firebase.database().ref('signs/' + id).set({
@@ -146,26 +159,115 @@ export default class App extends React.Component {
       camera: camera,
       scene: scene
     });
+    var app = this;
     this.state.signs.forEach((sign) => {
       scene.add(sign);
+      console.log("Added a sign");
     });
 
     const animate = () => {
       requestAnimationFrame(animate);
       this.state.signs.forEach((sign) => {
         sign.rotation.y += 0.015;
-      });
+      })
       renderer.render(scene, camera);
       gl.endFrameEXP();
     }
     animate();
   }
 
+  toRadians = function(angle) {
+    return angle * (Math.PI / 180);
+  }
+
+
+  orient = function(heading, lat, long, alt) {
+    console.log("heading is " + heading);
+    var current = this.state.locations.work;
+    var distance = this.distance(current.latitude, current.longitude, lat, long);
+    console.log("distance is " + distance);
+    var angle = this.angle(current.longitude, current.latitude, long, lat);
+    console.log("angle is " + angle);
+    var absoluteAngle = heading - (-1 * angle + 90);
+    if (absoluteAngle > 180) {
+      absoluteAngle -= 360;
+    }
+    var zMultiplier = -1;
+    var xMultiplier = 1;
+    if (absoluteAngle > 0) {
+      if (absoluteAngle > 90) {
+        zMultiplier = 1;
+        absoluteAngle = 180 - absoluteAngle;
+      }
+      xMultiplier = -1;
+    } else if (absoluteAngle < 0) {
+      if (absoluteAngle < -90) {
+        zMultiplier = 1;
+        absoluteAngle += 180;
+      } else {
+        absoluteAngle *= -1;
+      }
+    }
+    console.log("absolute angle is " + absoluteAngle);
+    var z = zMultiplier * Math.cos(this.toRadians(absoluteAngle)) * distance * this.state.multiplier;
+    var x = xMultiplier * Math.sin(this.toRadians(absoluteAngle)) * distance * this.state.multiplier;
+    var y = (alt - current.altitude) / 10;
+    return [x, y, z];
+  }
+
+  distance = function(lat1, lon1, lat2, lon2) {
+  	var radlat1 = Math.PI * lat1/180;
+  	var radlat2 = Math.PI * lat2/180;
+  	var theta = lon1-lon2;
+  	var radtheta = Math.PI * theta/180;
+  	var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+  	dist = Math.acos(dist);
+  	dist = dist * 180/Math.PI;
+  	dist = dist * 60 * 1.1515;
+    dist = dist * 5280;
+  	return dist
+  }
+
+  angle = function(cx, cy, ex, ey) {
+    var dy = ey - cy;
+    var dx = ex - cx;
+    var theta = Math.atan2(dy, dx); // range (-PI, PI]
+    theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
+    if (theta < 0) theta = 360 + theta; // range [0, 360)
+    return theta;
+  }
+
+  // loadSigns = function(callback) {
+  //   await this.createSignTypes();
+  //   var app = this;
+  //   Location.getHeadingAsync().then(function(heading) {
+  //     var signs = [];
+  //     firebase.database().ref('signs/').on('value', function(snapshot) {
+  //         snapshot.forEach(function(childSnapshot) {
+  //           var sign = childSnapshot.val();
+  //           let childData = childSnapshot.val();
+  //           let mesh = app.createMesh(childData.type);
+  //           // var position = app.orient(heading.trueHeading, sign.latitude, sign.longitude, sign.altitude);
+  //           // console.log(position);
+  //           // cube.position.x = position[0];
+  //           // cube.position.y = position[1];
+  //           // cube.position.z = position[2];
+  //           signs.push(app.place(mesh));
+  //         });
+  //         app.setState({
+  //           signs: signList
+  //         }, function() {
+  //           callback();
+  //         });
+  //     });
+  //   });
+  // }
+
   createSignTypes = async () => {// Create a mesh for each sign type
     let tempTypes = {};
 
     //bathroom
-    const bathroomGeometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
+    const bathroomGeometry = new THREE.BoxGeometry(1, 1, 1);
     var bathroomMaterial = new THREE.MeshBasicMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/restroom_signs_unisex.jpg')),
@@ -174,7 +276,7 @@ export default class App extends React.Component {
     tempTypes.bathroom = {geometry: bathroomGeometry, material: bathroomMaterial};
 
     //exit
-    const exitGeometry = new THREE.BoxGeometry(0.1, 0.06, 0.03);
+    const exitGeometry = new THREE.BoxGeometry(1, 0.6, 0.3);
     const exitMaterial = new THREE.MeshBasicMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/exit.jpg'))
@@ -190,27 +292,42 @@ export default class App extends React.Component {
     return new THREE.Mesh(template.geometry, template.material);
   }
 
-  place = (mesh) => {
-    mesh.position.x = Math.random() / 3;
-    mesh.position.y = Math.random() / 3;
-    mesh.position.z = Math.random() / 3;
+  place = (heading, mesh, sign) => {
+    let app = this;
+    let position = app.orient(heading.trueHeading, sign.latitude, sign.longitude, sign.altitude);
+    mesh.position.x = position[0];
+    mesh.position.y = position[1];
+    mesh.position.z = position[2];
     return mesh;
   }
 
   loadSigns = async () => {
     await this.createSignTypes();
+    let heading = await Location.getHeadingAsync();
     let signs = [];
     let app = this;
     firebase.database().ref('signs/').on('value', (snapshot) => {
-        snapshot.forEach(function(childSnapshot) {
-          let childData = childSnapshot.val();
-          let mesh = app.createMesh(childData.type);
-          signs.push(app.place(mesh));
-          if (app.state.scene) {
-            app.state.scene.add(mesh);
-          }
-        });
-        app.setState({signs: app.state.signs.concat(signs), loaded: true});  //TODO: remove concat
+      snapshot.forEach(function(childSnapshot) {
+        let childData = childSnapshot.val();
+        let mesh = app.createMesh(childData.type);
+        signs.push(app.place(heading, mesh, childData));
+        if (app.state.scene) {
+          app.state.scene.add(mesh);
+        }
+      });
+      console.log("signs: "+signs.length);
+      app.setState({signs: signs, loaded: true});
+      // for(var i = 0; i < snapshot.length; i++) {
+      //   console.log("adding");
+      //   let childSnapshot = snapshot[i];
+      //   let childData = childSnapshot.val();
+      //   let mesh = app.createMesh(childData.type);
+      //   signs.push(app.place(heading, mesh));
+      //   if (app.state.scene) {
+      //     app.state.scene.add(mesh);
+      //   }
+      // }
+      // app.setState({signs: app.state.signs.concat(signs), loaded: true});
     });
   }
 
@@ -248,8 +365,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     backgroundColor: '#27ae60',
-    color: '#ecf0f1',
-    fontSize: 20,
     padding: 10,
     margin: 10
   },
@@ -259,8 +374,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderColor: '#ecf0f1',
-    color: '#ecf0f1',
-    fontSize: 20,
     padding: 10,
     margin: 10
   },
