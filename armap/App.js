@@ -45,7 +45,7 @@ export default class App extends React.Component {
         },
       },
       camera: null,
-      multiplier: 0.5,
+      multiplier: 0.57,
       scene: null
     };
   }
@@ -182,16 +182,14 @@ export default class App extends React.Component {
 
 
   orient = function(heading, lat, long, alt) {
-    console.log("heading is " + heading);
     var current = this.state.locations.work;
     var distance = this.distance(current.latitude, current.longitude, lat, long);
-    console.log("distance is " + distance);
     var angle = this.angle(current.longitude, current.latitude, long, lat);
-    console.log("angle is " + angle);
     var absoluteAngle = heading - (-1 * angle + 90);
     if (absoluteAngle > 180) {
       absoluteAngle -= 360;
     }
+    console.log("absolute angle: " + absoluteAngle);
     var zMultiplier = -1;
     var xMultiplier = 1;
     if (absoluteAngle > 0) {
@@ -208,7 +206,6 @@ export default class App extends React.Component {
         absoluteAngle *= -1;
       }
     }
-    console.log("absolute angle is " + absoluteAngle);
     var z = zMultiplier * Math.cos(this.toRadians(absoluteAngle)) * distance * this.state.multiplier;
     var x = xMultiplier * Math.sin(this.toRadians(absoluteAngle)) * distance * this.state.multiplier;
     var y = (alt - current.altitude);
@@ -293,6 +290,15 @@ export default class App extends React.Component {
     });
     tempTypes.waterFountain = {geometry: waterFountainGeometry, material: waterFountainMaterial};
 
+    //stairs
+    const stairsGeometry = new THREE.BoxGeometry(1, 1, 1);
+    var stairsMaterial = new THREE.MeshBasicMaterial({
+      map: await ExpoTHREE.createTextureAsync({
+        asset: Expo.Asset.fromModule(require('./assets/stairs.png')),
+      })
+    });
+    tempTypes.stairs = {geometry: stairsGeometry, material: stairsMaterial};
+
     this.setState({signTypes: tempTypes});
   }
 
@@ -303,8 +309,16 @@ export default class App extends React.Component {
 
   place = (heading, mesh, sign) => {
     let app = this;
+    console.log("TYPE: " + sign.type);
     let position = app.orient(heading.trueHeading, sign.latitude, sign.longitude, sign.altitude);
-    mesh.material.opacity = 0.5;
+    var opacity = 1;
+
+    var scale = 50 - position[3];
+    if (scale < 0) {
+      scale = 0;
+    }
+    opacity = 0.6 + 0.4 * (scale / 50);
+    mesh.material.opacity = opacity;
     mesh.position.x = position[0];
     mesh.position.y = position[1];
     mesh.position.z = position[2];
@@ -312,6 +326,11 @@ export default class App extends React.Component {
   }
 
   loadSigns = async () => {
+    // if (this.state.scene) {
+    //   while(this.state.scene.children.length > 0){
+    //     this.state.scene.remove(this.state.scene.children[0]);
+    //   }
+    // }
     await this.createSignTypes();
     let heading = await Location.getHeadingAsync();
     let signs = [];
