@@ -3,6 +3,7 @@ import React from 'react';
 import * as THREE from 'three';
 import ExpoTHREE from 'expo-three';
 import Expo from 'expo';
+let Parse = require('./utils/parseSvg.js');
 import { Constants, Location, Permissions } from 'expo';
 import { StyleSheet, Text, View, Button, PanResponder, TouchableOpacity, Picker } from 'react-native';
 
@@ -93,6 +94,9 @@ export default class App extends React.Component {
         onContextCreate={this._onGLContextCreate}/>
         <View style={{ position: 'absolute', left: 0, right: 0, justifyContent: 'center', alignItems: 'center', top: this.state.interfacePosition+'%' }}>
           <Text style={{ color: '#fff', fontSize: 30, fontWeight: 'bold', marginBottom: 20 }}>PathfindAR</Text>
+          <TouchableOpacity style={styles.button} onPress={this.loadFloorPlan}>
+            <Text style={styles.interfaceTextSmall}>Show floor plan</Text>
+          </TouchableOpacity>
           <Text style={styles.interfaceText}>Add waypoint</Text>
           <View style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: 10 }}>
             <TouchableOpacity style={styles.button} onPress={() => {this.setSign('bathroom')}}>
@@ -303,6 +307,13 @@ export default class App extends React.Component {
     mesh.position.y = position[1];
     mesh.position.z = position[2];
     return mesh;
+  }
+
+  loadFloorPlan = async () => {
+    let geometry = new THREE.PlaneGeometry( 5, 20, 32 );
+    let material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+    let plane = new THREE.Mesh( geometry, material );
+    this.state.scene.add( plane );
   }
 
   loadSigns = async () => {
