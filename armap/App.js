@@ -27,7 +27,6 @@ export default class App extends React.Component {
       loaded: false,
       signs: [],
       location: null,
-      cube: null,
       camera: null
     };
   }
