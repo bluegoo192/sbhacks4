@@ -27,6 +27,10 @@ export default class App extends React.Component {
       loaded: false,
       signs: [],
       location: null,
+      camera: null,
+      latitude: 0,
+      longitude: 0,
+      altitude: 0,
       camera: null
     };
   }
@@ -127,6 +131,16 @@ export default class App extends React.Component {
     renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
 
     scene.background = ExpoTHREE.createARBackgroundTexture(arSession, renderer);
+
+    const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
+    var material = new THREE.MeshBasicMaterial({
+      map: await ExpoTHREE.createTextureAsync({
+        asset: Expo.Asset.fromModule(require('./assets/restroom_signs_unisex.jpg')),
+      })
+    });
+    const cube = new THREE.Mesh(geometry, material);
+    cube.position.z = -0.4;
+    scene.add(cube);
     this.setState({
       camera: camera
     });
@@ -137,6 +151,7 @@ export default class App extends React.Component {
 
     const animate = () => {
       requestAnimationFrame(animate);
+      cube.rotation.y += 0.04;
       renderer.render(scene, camera);
       gl.endFrameEXP();
     }
@@ -144,14 +159,19 @@ export default class App extends React.Component {
   }
 
   loadSigns = async () => {
+    firebase.database().ref('signs/').on('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          var childData = childSnapshot.val();
+        });
+    });
     // get signs from Firebase
-    const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    cube.position.x = 0;
-    cube.position.y = 0;
-    cube.position.z = 1;
-    this.setState({signs: this.state.signs.concat([cube]), loaded: true});
+    // const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
+    // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    // const cube = new THREE.Mesh(geometry, material);
+    // cube.position.x = 0;
+    // cube.position.y = 0;
+    // cube.position.z = -0.4;
+    // this.setState({signs: this.state.signs.concat([cube]), loaded: true});
   }
 
   validateInterfacePosition = () => {
