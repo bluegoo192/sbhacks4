@@ -35,9 +35,9 @@ export default class App extends React.Component {
           altitude: 20
         },
         demo: {
-          latitude: 34.411514,
-          longitude: -119.846795,
-          altitude: 20
+          latitude: 34.411635,
+          longitude: -119.84705,
+          altitude: 14
         },
         stage: {
           latitude: 34.411514,
