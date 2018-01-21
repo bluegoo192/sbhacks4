@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import ExpoTHREE from 'expo-three';
 import Expo from 'expo';
 import { Constants, Location, Permissions } from 'expo';
-import { StyleSheet, Text, View, Button, PanResponder, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Button, PanResponder, TouchableOpacity, Picker } from 'react-native';
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -72,10 +72,15 @@ export default class App extends React.Component {
         style={{ flex: 1 }}
         onContextCreate={this._onGLContextCreate}/>
         <View style={{ position: 'absolute', left: 0, right: 0, justifyContent: 'center', alignItems: 'center', top: this.state.interfacePosition+'%' }}>
-          <Text style={styles.interfaceText}>Test text please ignore</Text>
-          <TouchableOpacity style={styles.button} onPress={() => {this.setSign('exit')}}>
-            <Text>Add bathroom sign</Text>
-          </TouchableOpacity>
+          <Text style={styles.interfaceText}>Add waypoint</Text>
+          <View style={{ display: 'flex', flexDirection: 'horizontal', width: '100%' }}>
+            <TouchableOpacity style={styles.button} onPress={() => {this.setSign('bathroom')}}>
+              <Text>Bathroom</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => {this.setSign('exit')}}>
+              <Text>Exit</Text>
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity style={styles.button} onPress={this.closeInterface}>
             <Text>Close</Text>
           </TouchableOpacity>
@@ -238,6 +243,8 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   button: {
+    flex: 1,
+    display: 'flex',
     alignItems: 'center',
     backgroundColor: '#DDDDDD',
     padding: 10
