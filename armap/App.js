@@ -47,7 +47,15 @@ export default class App extends React.Component {
       },
       camera: null,
       multiplier: 0.57,
-      scene: null
+      heading: 0,
+      scene: null,
+      corwinFloor1: {
+        latitude: 34.411629,
+        longitude: -119.847158,
+        altitude: 0
+      },
+      floorPlans: [],
+      floorPlanLoaded: false
     };
   }
 
@@ -171,12 +179,21 @@ export default class App extends React.Component {
       scene.add(sign);
       console.log("Added a sign");
     });
+    // if (!this.state.floorPlanLoaded) {
+    //   this.state.floorPlans.forEach((floorPlan => {
+    //     scene.add(floorPlan);
+    //   }));
+    //   app.setState({floorPlanLoaded: true});
+    // }
 
     const animate = () => {
       requestAnimationFrame(animate);
       this.state.signs.forEach((sign) => {
         sign.rotation.y += 0.015;
       });
+      // this.state.floorPlans.forEach((floorPlan) => {
+      //   floorPlan.rotation.z += 0.015;
+      // })
       if (this.state.interfacePosition < 100 && this.state.interfacePosition > 30 && !this.touching) {
         this.setState({interfacePosition: this.state.interfacePosition - (this.state.interfacePosition / 13) });
       }
@@ -289,7 +306,8 @@ export default class App extends React.Component {
 
   createMesh = (type) => {
     let template = this.state.signTypes[type];
-    return new THREE.Mesh(template.geometry, template.material);
+    let meshTemp = new THREE.Mesh(template.geometry, template.material);
+    return meshTemp;
   }
 
   place = (heading, mesh, sign) => {
@@ -311,6 +329,7 @@ export default class App extends React.Component {
   }
 
   loadFloorPlan = async () => {
+    let app = this;
     let geometry = new THREE.PlaneGeometry( 20, 20, 32 );
     let material = new THREE.MeshLambertMaterial({
       map: await ExpoTHREE.createTextureAsync({
@@ -323,7 +342,13 @@ export default class App extends React.Component {
     let plane = new THREE.Mesh( geometry, material );
     plane.rotateX(Math.PI / 2);
     plane.position.y -= 4;
+    let position = app.orient(app.state.heading.trueHeading, app.state.corwinFloor1.latitude, app.state.corwinFloor1.longitude, app.state.corwinFloor1.altitude);
+    plane.position.x = position[0];
+    plane.position.y = position[1];
+    plane.position.z = position[2];
+    plane.rotation.z = this.toRadians((-1 * app.state.heading.trueHeading) + 180);
     this.state.scene.add( plane );
+    this.setState({floorPlans: [plane]});
   }
 
   loadSigns = async () => {
@@ -334,6 +359,7 @@ export default class App extends React.Component {
     // }
     await this.createSignTypes();
     let heading = await Location.getHeadingAsync();
+    this.setState({heading: heading});
     let signs = [];
     let app = this;
     firebase.database().ref('signs/').on('value', (snapshot) => {
