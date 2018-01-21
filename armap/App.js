@@ -267,10 +267,11 @@ export default class App extends React.Component {
 
     //water fountain
     const waterFountainGeometry = new THREE.BoxGeometry(1, 1, 1);
-    var waterFountainMaterial = new THREE.MeshBasicMaterial({
+    var waterFountainMaterial = new THREE.MeshLambertMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/water_fountain.png')),
-      })
+      }),
+      transparent: true
     });
     tempTypes.waterFountain = {geometry: waterFountainGeometry, material: waterFountainMaterial};
 
@@ -310,9 +311,18 @@ export default class App extends React.Component {
   }
 
   loadFloorPlan = async () => {
-    let geometry = new THREE.PlaneGeometry( 5, 20, 32 );
-    let material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+    let geometry = new THREE.PlaneGeometry( 20, 20, 32 );
+    let material = new THREE.MeshLambertMaterial({
+      map: await ExpoTHREE.createTextureAsync({
+        asset: Expo.Asset.fromModule(require('./assets/grid.png')),
+      }),
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.8
+    });
     let plane = new THREE.Mesh( geometry, material );
+    plane.rotateX(Math.PI / 2);
+    plane.position.y -= 4;
     this.state.scene.add( plane );
   }
 
