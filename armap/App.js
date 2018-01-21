@@ -340,6 +340,15 @@ export default class App extends React.Component {
     });
     tempTypes.elevator = {geometry: elevatorGeometry, material: elevatorMaterial};
 
+    //food
+    const foodGeometry = new THREE.BoxGeometry(0.9, 0.9, 0.9);
+    var foodMaterial = new THREE.MeshBasicMaterial({
+      map: await ExpoTHREE.createTextureAsync({
+        asset: Expo.Asset.fromModule(require('./assets/food.png')),
+      })
+    });
+    tempTypes.food = {geometry: foodGeometry, material: foodMaterial};
+
     this.setState({signTypes: tempTypes});
   }
 
