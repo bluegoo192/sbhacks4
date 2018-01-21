@@ -25,6 +25,7 @@ export default class App extends React.Component {
     this.state = {
       interfacePosition: 100,
       loaded: false,
+      signTypes: {},
       signs: [],
       location: null,
       camera: null,
@@ -95,7 +96,7 @@ export default class App extends React.Component {
     console.log(location);
   };
 
-  setSign = async (text) => {
+  setSign = async (signType) => {
     Location.getCurrentPositionAsync({
       enableHighAccuracy: true
     }).then(function(location) {
@@ -105,7 +106,7 @@ export default class App extends React.Component {
       var id = location.coords.latitude.toString().replace(".", "-") + "&" + location.coords.longitude.toString().replace(".", "-") + "&" + location.coords.altitude.toString().replace(".", "-");
       console.log(id);
       firebase.database().ref('signs/' + id).set({
-        text: text,
+        type: signType,
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
         altitude: location.coords.altitude,
@@ -150,20 +151,28 @@ export default class App extends React.Component {
     animate();
   }
 
-  loadSigns = async () => {
-    firebase.database().ref('signs/').on('value', function(snapshot) {
-        snapshot.forEach(function(childSnapshot) {
-          var childData = childSnapshot.val();
-        });
-    });
+  createSignTypes = async () => {// Create a mesh for each sign type
+    let tempTypes = {};
     const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
     var material = new THREE.MeshBasicMaterial({
       map: await ExpoTHREE.createTextureAsync({
         asset: Expo.Asset.fromModule(require('./assets/restroom_signs_unisex.jpg')),
       })
     });
-    const cube = new THREE.Mesh(geometry, material);
-    cube.position.z = -0.4;
+    const bathroomCube = new THREE.Mesh(geometry, material);
+    tempTypes.bathroom = bathroomCube;
+    this.setState({signTypes: tempTypes});
+  }
+
+  loadSigns = async () => {
+    await this.createSignTypes();
+    firebase.database().ref('signs/').on('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          var childData = childSnapshot.val();
+        });
+    });
+    let cube = this.state.signTypes.bathroom;
+    cube.position.z = 0.3;
     // get signs from Firebase
     // const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.07);
     // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
