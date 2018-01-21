@@ -113,10 +113,7 @@ export default class App extends React.Component {
           <Text style={{ fontFamily: 'Bodoni 72', margin: 10, alignItems: 'center', fontSize: 50, color: '#fff', fontStyle: 'italic' }}>Pathfind<Text style={{ fontWeight: 'bold', fontStyle: 'normal', fontFamily: 'Avenir' }}>AR</Text></Text>
         </View>
         <View style={{ position: 'absolute', left: 0, right: 0, justifyContent: 'center', alignItems: 'center', top: this.state.interfacePosition+'%' }}>
-          <Text style={{ fontFamily: 'Bodoni 72', margin: 10, alignItems: 'center', fontSize: 50, color: '#fff', fontStyle: 'italic' }}>Pathfind<Text style={{ fontWeight: 'bold', fontStyle: 'normal', fontFamily: 'Avenir' }}>AR</Text></Text>
-          <TouchableOpacity style={styles.button} onPress={this.loadFloorPlan}>
-            <Text style={styles.interfaceTextSmall}>Show floor plan</Text>
-          </TouchableOpacity>
+          <Text style={{ fontFamily: 'Bodoni 72', margin: 10, paddingBottom: 10, alignItems: 'center', fontSize: 50, color: '#fff', fontStyle: 'italic' }}>Pathfind<Text style={{ fontWeight: 'bold', fontStyle: 'normal', fontFamily: 'Avenir' }}>AR</Text></Text>
           <Text style={styles.interfaceText}>Add waypoint</Text>
           <View style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: 10 }}>
             <TouchableOpacity style={styles.button} onPress={() => {this.setSign('bathroom')}}>
@@ -134,9 +131,14 @@ export default class App extends React.Component {
               <Image style={{width: 100, height: 100}} source={require('./assets/anim_stairs.gif')} />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.closeButton} onPress={this.closeInterface}>
-            <Text style={styles.interfaceText}>Close</Text>
-          </TouchableOpacity>
+          <View style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: 10, marginTop: 10 }}>
+            <TouchableOpacity style={styles.closeButton} onPress={this.loadFloorPlan}>
+              <Text style={styles.interfaceTextSmall}>Show floor plans</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.closeButton} onPress={this.closeInterface}>
+              <Text style={styles.interfaceText}>Close</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -411,7 +413,7 @@ export default class App extends React.Component {
 
 }
 
-const uiOffset = 20;
+const uiOffset = 15;
 
 const styles = StyleSheet.create({
   button: {
@@ -428,6 +430,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderColor: '#ecf0f1',
+    justifyContent: 'center',
     padding: 10,
     margin: 10
   },
