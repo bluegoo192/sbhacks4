@@ -128,14 +128,7 @@ export default class App extends React.Component {
     renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
 
     scene.background = ExpoTHREE.createARBackgroundTexture(arSession, renderer);
-
-    const geometry = new THREE.BoxGeometry(0.07, 0.07, 0.02);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    cube.position.z = -0.4;
-    scene.add(cube);
     this.setState({
-      cube: cube,
       camera: camera
     });
     this.state.signs.forEach((sign) => {
@@ -145,7 +138,6 @@ export default class App extends React.Component {
 
     const animate = () => {
       requestAnimationFrame(animate);
-      this.state.cube.rotation.y += 0.04;
       renderer.render(scene, camera);
       gl.endFrameEXP();
     }
